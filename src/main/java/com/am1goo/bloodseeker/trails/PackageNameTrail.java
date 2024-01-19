@@ -23,6 +23,7 @@ public class PackageNameTrail implements ITrail {
 	}
 	
 	@Override
+	@SuppressWarnings("rawtypes")
 	public void seek(List<IResult> result, List<Exception> exceptions) {
 		for (int i =0; i < packageNames.length; ++i) {
 			String packageName = packageNames[i];
@@ -33,7 +34,8 @@ public class PackageNameTrail implements ITrail {
 			}
 		}
 	}
-	
+
+	@SuppressWarnings("rawtypes")
 	private Set<Class> findAllClassesUsingClassLoader(String packageName, List<Exception> exceptions) {
         InputStream stream = ClassLoader.getSystemClassLoader()
         	.getResourceAsStream(packageName.replaceAll("[.]", "/"));
@@ -45,6 +47,7 @@ public class PackageNameTrail implements ITrail {
         	.collect(Collectors.toSet());
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private Class getClass(String className, String packageName, List<Exception> exceptions) {
         try {
             return Class.forName(packageName + "." + className.substring(0, className.lastIndexOf('.')));

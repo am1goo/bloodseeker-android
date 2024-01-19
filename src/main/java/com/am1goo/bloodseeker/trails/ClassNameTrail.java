@@ -18,6 +18,7 @@ public class ClassNameTrail implements ITrail {
 	}
 	
 	@Override
+	@SuppressWarnings("rawtypes")
 	public void seek(List<IResult> result, List<Exception> exceptions) {
 		for (int i = 0; i < classNames.length; ++i) {
 			String className = classNames[i];
@@ -27,7 +28,8 @@ public class ClassNameTrail implements ITrail {
 			}
 		}
 	}
-	
+
+	@SuppressWarnings("rawtypes")
 	private Class getClass(String className, List<Exception> exceptions) {
         try {
             return Class.forName(className);
