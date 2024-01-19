@@ -11,18 +11,18 @@
 # Specify the input jars, output jars, and library jars.
 # In this case, the input jar is the program library that we want to process.
 
--injars  release/bloodseeker-android.jar
--outjars release/bloodseeker-android-sec.jar
+#-injars  release/bloodseeker-android.jar
+#-outjars release/bloodseeker-android-sec.jar
 
 # Before Java 9, the runtime classes were packaged in a single jar file.
--libraryjars <java.home>/lib/rt.jar
+#-libraryjars <java.home>/lib/rt.jar
 
 # Save the obfuscation mapping to a file, so we can de-obfuscate any stack
 # traces later on. Keep a fixed source file attribute and all line number
 # tables to get line numbers in the stack traces.
 # You can comment this out if you're not interested in stack traces.
 
--printmapping release/bloodseeker-android-obfuscation.map
+#-printmapping release/bloodseeker-android-obfuscation.map
 -keepparameternames
 -renamesourcefileattribute SourceFile
 -keepattributes Signature,Exceptions,
