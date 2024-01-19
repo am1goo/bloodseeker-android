@@ -22,7 +22,31 @@ public class Report {
     	return results;
     }
     
+    public String[] getEntries() {
+    	if (results == null) {
+    		return new String[0];
+    	}
+    	
+    	String[] array = new String[results.size()];
+    	for (int i = 0; i < results.size(); ++i) {
+    		array[i] = results.get(i).toString();
+    	}
+    	return array;
+    }
+    
     public List<Exception> getExceptions() {	
     	return exceptions;
+    }
+    
+    public String[] getErrors() {
+    	if (exceptions == null) {
+    		return new String[0];
+    	}
+    	
+    	String[] array = new String[exceptions.size()];
+    	for (int i = 0; i < exceptions.size(); ++i) {
+    		array[i] = exceptions.get(i).toString();
+    	}
+    	return array;
     }
 }
