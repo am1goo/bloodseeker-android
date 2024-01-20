@@ -1,4 +1,4 @@
-package com.am1goo.bloodseeker;
+package com.am1goo.bloodseeker.android;
 
 import java.util.List;
 

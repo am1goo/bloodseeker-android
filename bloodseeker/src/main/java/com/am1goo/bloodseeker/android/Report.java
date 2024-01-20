@@ -1,4 +1,4 @@
-package com.am1goo.bloodseeker;
+package com.am1goo.bloodseeker.android;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ public class Report {
     private List<Exception> exceptions;
     
     public Report(List<IResult> results, List<Exception> exceptions) {
-    	this.success = results != null && results.size() > 0;
+    	this.success = results != null && !results.isEmpty();
     	this.results = results;
     	this.exceptions = exceptions;
     }

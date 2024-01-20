@@ -1,1 +1,0 @@
-# bloodseeker-android

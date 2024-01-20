@@ -1,12 +1,13 @@
-package com.am1goo.bloodseeker.trails;
+package com.am1goo.bloodseeker.android.trails;
 
 import java.util.List;
 
-import com.am1goo.bloodseeker.IResult;
-import com.am1goo.bloodseeker.ITrail;
+import com.am1goo.bloodseeker.android.IResult;
+import com.am1goo.bloodseeker.android.ITrail;
 
 public class LibraryTrail implements ITrail {
-	private String[] libraryNames;
+
+	private final String[] libraryNames;
 	
 	public LibraryTrail(String libraryName) {
 		this.libraryNames = new String[] { libraryName };
@@ -42,7 +43,7 @@ public class LibraryTrail implements ITrail {
 	}
 	
 	public class Result implements IResult {
-		private String libraryName;
+		private final String libraryName;
 		
 		public Result(String libraryName) {
 			this.libraryName = libraryName;
@@ -50,7 +51,7 @@ public class LibraryTrail implements ITrail {
 		
 		@Override
 		public String toString() {
-			return libraryName;
+			return "Library '" + libraryName + "' found";
 		}
 	}
 }

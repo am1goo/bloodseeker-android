@@ -1,4 +1,4 @@
-package com.am1goo.bloodseeker;
+package com.am1goo.bloodseeker.android;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class Bloodseeker {
     	boolean result = false;
     	
     	List<ITrail> trails = db.getTrails();
-    	for (int i =0; i < trails.size(); ++i) {
+    	for (int i = 0; i < trails.size(); ++i) {
     		ITrail trail = trails.get(i);
     		result |= addTrail(trail);
     	}

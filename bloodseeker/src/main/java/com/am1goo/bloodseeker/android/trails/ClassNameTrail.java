@@ -1,13 +1,14 @@
-package com.am1goo.bloodseeker.trails;
+package com.am1goo.bloodseeker.android.trails;
 
 import java.util.List;
 
-import com.am1goo.bloodseeker.IResult;
-import com.am1goo.bloodseeker.ITrail;
+import com.am1goo.bloodseeker.android.IResult;
+import com.am1goo.bloodseeker.android.ITrail;
+import com.am1goo.bloodseeker.android.Utilities;
 
 public class ClassNameTrail implements ITrail {
-	
-	private String[] classNames;
+
+	private final String[] classNames;
 	
 	public ClassNameTrail(String className) {
 		this.classNames = new String[] { className };
@@ -18,32 +19,18 @@ public class ClassNameTrail implements ITrail {
 	}
 	
 	@Override
-	@SuppressWarnings("rawtypes")
 	public void seek(List<IResult> result, List<Exception> exceptions) {
 		for (int i = 0; i < classNames.length; ++i) {
 			String className = classNames[i];
-			Class clazz = getClass(className, exceptions);
+			Class<?> clazz = Utilities.getClass(className, exceptions);
 			if (clazz != null) {
 				result.add(new Result(className));
 			}
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	private Class getClass(String className, List<Exception> exceptions) {
-        try {
-            return Class.forName(className);
-        } catch (ClassNotFoundException ex) {
-        	//do nothing
-        }
-        catch (Exception ex) {
-        	exceptions.add(ex);
-        }
-        return null;
-    }
-	
 	public class Result implements IResult {
-		private String className;
+		private final String className;
 		
 		public Result(String className) {
 			this.className = className;
@@ -51,7 +38,7 @@ public class ClassNameTrail implements ITrail {
 		
 		@Override
 		public String toString() {
-			return className;
+			return "Class '" + className + "' found";
 		}
 	}
 }
