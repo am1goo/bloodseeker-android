@@ -22,7 +22,7 @@ public class Report {
     	return results;
     }
     
-    public String[] getEntries() {
+    public String[] getEvidence() {
     	if (results == null) {
     		return new String[0];
     	}
