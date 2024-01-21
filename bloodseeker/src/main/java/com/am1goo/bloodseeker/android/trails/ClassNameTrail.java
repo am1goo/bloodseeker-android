@@ -20,8 +20,13 @@ public class ClassNameTrail implements ITrail {
 	
 	@Override
 	public void seek(List<IResult> result, List<Exception> exceptions) {
-		for (int i = 0; i < classNames.length; ++i) {
-			String className = classNames[i];
+		if (classNames == null)
+			return;
+
+		for (String className : classNames) {
+			if (className == null)
+				continue;
+
 			Class<?> clazz = Utilities.getClass(className, exceptions);
 			if (clazz != null) {
 				result.add(new Result(className));

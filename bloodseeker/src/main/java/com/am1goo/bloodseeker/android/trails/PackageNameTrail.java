@@ -35,6 +35,9 @@ public class PackageNameTrail implements ITrail {
 	
 	@Override
 	public void seek(List<IResult> result, List<Exception> exceptions) {
+		if (packageNames == null)
+			return;
+
 		try {
 			Set<String> foundPackages = findPackageName(packageNames, exceptions);
 			for (String foundPackage : foundPackages) {
@@ -141,6 +144,9 @@ public class PackageNameTrail implements ITrail {
 				String className = dexEntries.nextElement();
 
 				for (String packageName : packageNames) {
+					if (packageName == null)
+						continue;
+
 					if (className.startsWith(packageName)) {
 						results.add(packageName);
 					}

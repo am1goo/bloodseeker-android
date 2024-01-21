@@ -19,9 +19,13 @@ public class LibraryTrail implements ITrail {
 	
 	@Override
 	public void seek(List<IResult> result, List<Exception> exceptions) {
-		for (int i = 0; i < libraryNames.length; ++i) {
-			String libraryName = libraryNames[i];
-			
+		if (libraryNames == null)
+			return;
+
+		for (String libraryName : libraryNames) {
+			if (libraryName == null)
+				continue;
+
 			boolean isLibraryLoaded;  
 			try {
 				System.loadLibrary(libraryName);

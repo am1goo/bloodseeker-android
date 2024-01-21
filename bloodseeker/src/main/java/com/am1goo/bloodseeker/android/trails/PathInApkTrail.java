@@ -23,6 +23,9 @@ public class PathInApkTrail implements ITrail {
 
     @Override
     public void seek(List<IResult> result, List<Exception> exceptions) {
+        if (pathsInApk == null)
+            return;
+
         Activity activity = null;
         try{
             activity = Utilities.getUnityPlayerActivity();
@@ -41,6 +44,9 @@ public class PathInApkTrail implements ITrail {
             jarFile = new JarFile(appInfo.sourceDir);
 
             for (String pathInApk : pathsInApk) {
+                if (pathInApk == null)
+                    continue;
+
                 ZipEntry zipEntry = jarFile.getEntry(pathInApk);
                 if (zipEntry == null)
                     continue;
