@@ -11,19 +11,7 @@ public class Bloodseeker {
 		super();
 		this.trails = new ArrayList<ITrail>();
     }
-    
-    public boolean useDatabase(Database db) {
-    	boolean result = false;
-    	
-    	List<ITrail> trails = db.getTrails();
-    	for (int i = 0; i < trails.size(); ++i) {
-    		ITrail trail = trails.get(i);
-    		result |= addTrail(trail);
-    	}
-    	
-    	return result;
-    }
-       
+
     public boolean addTrail(ITrail trail) {
     	if (trail == null)
     		return false;

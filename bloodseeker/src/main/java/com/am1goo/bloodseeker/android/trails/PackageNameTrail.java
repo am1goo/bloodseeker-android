@@ -32,8 +32,6 @@ public class PackageNameTrail implements ITrail {
 	public PackageNameTrail(String[] packageNames) {
 		this.packageNames = packageNames;
 	}
-
-	private final static String unityPlayer = "com.unity3d.player.UnityPlayer";
 	
 	@Override
 	public void seek(List<IResult> result, List<Exception> exceptions) {
@@ -52,26 +50,16 @@ public class PackageNameTrail implements ITrail {
 	}
 
 	private Set<String> findPackageName(String[] packageNames, List<Exception> exceptions) {
-		Class<?> activityClass = Utilities.getClass(unityPlayer, exceptions);
-		if (activityClass == null) {
-			exceptions.add(new Exception("class " + unityPlayer + " not found"));
-			return new HashSet<String>();
-		}
-
-		Activity activity;
-		try {
-			Field fi = activityClass.getDeclaredField("currentActivity");
-			activity = (Activity) fi.get(null);
+		Activity activity = null;
+		try{
+			activity = Utilities.getUnityPlayerActivity();
 		}
 		catch (Exception ex) {
 			exceptions.add(ex);
-			activity = null;
 		}
 
-		if (activity == null) {
-			exceptions.add(new Exception("activity '" + unityPlayer + "' is not found"));
+		if (activity == null)
 			return new HashSet<String>();
-		}
 
 		Set<String> results = new HashSet<String>();
 		Context ctx = activity.getBaseContext();
