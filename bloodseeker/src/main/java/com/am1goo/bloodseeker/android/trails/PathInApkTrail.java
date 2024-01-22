@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 
+import com.am1goo.bloodseeker.android.AppContext;
 import com.am1goo.bloodseeker.android.IResult;
 import com.am1goo.bloodseeker.android.ITrail;
 import com.am1goo.bloodseeker.android.Utilities;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-public class PathInApkTrail implements ITrail {
+public class PathInApkTrail extends BaseTrail {
 
     private final String[] pathsInApk;
 
@@ -22,49 +23,27 @@ public class PathInApkTrail implements ITrail {
     }
 
     @Override
-    public void seek(List<IResult> result, List<Exception> exceptions) {
+    public void seek(AppContext context, List<IResult> result, List<Exception> exceptions) {
         if (pathsInApk == null)
             return;
 
-        Activity activity = null;
-        try{
-            activity = Utilities.getUnityPlayerActivity();
-        }
-        catch (Exception ex) {
-            exceptions.add(ex);
-        }
-
+        Activity activity = context.getActivity();
         if (activity == null)
             return;
 
-        Context ctx = activity.getBaseContext();
-        ApplicationInfo appInfo = ctx.getApplicationInfo();
-        JarFile jarFile = null;
-        try {
-            jarFile = new JarFile(appInfo.sourceDir);
+        JarFile jarFile = context.getBaseApk();
+        if (jarFile == null)
+            return;
 
-            for (String pathInApk : pathsInApk) {
-                if (pathInApk == null)
-                    continue;
+        for (String pathInApk : pathsInApk) {
+            if (pathInApk == null)
+                continue;
 
-                ZipEntry zipEntry = jarFile.getEntry(pathInApk);
-                if (zipEntry == null)
-                    continue;
+            ZipEntry zipEntry = jarFile.getEntry(pathInApk);
+            if (zipEntry == null)
+                continue;
 
-                result.add(new Result(pathInApk));
-            }
-        }
-        catch (IOException ex) {
-            exceptions.add(ex);
-        }
-        finally {
-            if (jarFile != null) {
-                try {
-                    jarFile.close();
-                } catch (IOException ex) {
-                    exceptions.add(ex);
-                }
-            }
+            result.add(new Result(pathInApk));
         }
     }
 

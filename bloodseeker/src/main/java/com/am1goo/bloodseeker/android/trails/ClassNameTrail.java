@@ -2,11 +2,12 @@ package com.am1goo.bloodseeker.android.trails;
 
 import java.util.List;
 
+import com.am1goo.bloodseeker.android.AppContext;
 import com.am1goo.bloodseeker.android.IResult;
 import com.am1goo.bloodseeker.android.ITrail;
 import com.am1goo.bloodseeker.android.Utilities;
 
-public class ClassNameTrail implements ITrail {
+public class ClassNameTrail extends BaseTrail {
 
 	private final String[] classNames;
 	
@@ -19,7 +20,7 @@ public class ClassNameTrail implements ITrail {
 	}
 	
 	@Override
-	public void seek(List<IResult> result, List<Exception> exceptions) {
+	public void seek(AppContext context, List<IResult> result, List<Exception> exceptions) {
 		if (classNames == null)
 			return;
 

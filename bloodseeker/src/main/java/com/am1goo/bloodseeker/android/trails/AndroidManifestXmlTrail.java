@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 
+import com.am1goo.bloodseeker.android.AppContext;
 import com.am1goo.bloodseeker.android.IResult;
 import com.am1goo.bloodseeker.android.ITrail;
 import com.am1goo.bloodseeker.android.Utilities;
@@ -26,7 +27,7 @@ import java.util.zip.ZipEntry;
 import pxb.android.axml.Axml;
 import pxb.android.axml.AxmlReader;
 
-public class AndroidManifestXmlTrail implements ITrail {
+public class AndroidManifestXmlTrail extends BaseTrail {
 
     private static final String androidManifestFilename = "AndroidManifest.xml";
     private static final String androidManifestNamespace = "http://schemas.android.com/apk/res/android";
@@ -64,96 +65,74 @@ public class AndroidManifestXmlTrail implements ITrail {
     }
 
     @Override
-    public void seek(List<IResult> result, List<Exception> exceptions) {
+    public void seek(AppContext context, List<IResult> result, List<Exception> exceptions) {
         exceptions.addAll(this.exceptions);
 
-        Activity activity = null;
-        try{
-            activity = Utilities.getUnityPlayerActivity();
-        }
-        catch (Exception ex) {
-            exceptions.add(ex);
-        }
-
+        Activity activity = context.getActivity();
         if (activity == null)
             return;
 
-        Context ctx = activity.getBaseContext();
-        ApplicationInfo appInfo = ctx.getApplicationInfo();
-        JarFile jarFile = null;
+        JarFile jarFile = context.getBaseApk();
+        if (jarFile == null)
+            return;
+
+        ZipEntry zipEntry = jarFile.getEntry(androidManifestFilename);
+        if (zipEntry == null) {
+            exceptions.add(new FileNotFoundException(androidManifestFilename));
+            return;
+        }
+
+        InputStream inputStream = null;
         try {
-            jarFile = new JarFile(appInfo.sourceDir);
-            ZipEntry zipEntry = jarFile.getEntry(androidManifestFilename);
-            if (zipEntry == null) {
-                exceptions.add(new FileNotFoundException(androidManifestFilename));
-                return;
+            inputStream = jarFile.getInputStream(zipEntry);
+
+            byte[] bytes = Utilities.readAllBytes(inputStream);
+            AxmlReader reader = new AxmlReader(bytes);
+            Axml axml = new Axml();
+            reader.accept(axml);
+
+            Map<String, String> nses = new HashMap<String, String>();
+            for (Axml.Ns ns : axml.nses) {
+                String uri = ns.uri != null ? ns.uri : androidManifestNamespace;
+                nses.put(ns.prefix, uri);
             }
 
-            InputStream inputStream = null;
-            try {
-                inputStream = jarFile.getInputStream(zipEntry);
+            for (Looker looker : lookers) {
+                String[] paths = looker.nodes;
+                String attribute = looker.attribute;
+                String expectedValue = looker.value;
 
-                byte[] bytes = Utilities.readAllBytes(inputStream);
-                AxmlReader reader = new AxmlReader(bytes);
-                Axml axml = new Axml();
-                reader.accept(axml);
-
-                Map<String, String> nses = new HashMap<String, String>();
-                for (Axml.Ns ns: axml.nses) {
-                    String uri = ns.uri != null ? ns.uri : androidManifestNamespace;
-                    nses.put(ns.prefix, uri);
+                Axml.Node foundNode = findAxmlNode(axml.firsts, paths);
+                if (foundNode == null) {
+                    String pathsAsStr = String.join("/", paths);
+                    result.add(new NodeNotFoundResult(pathsAsStr));
+                    continue;
                 }
 
-                for (Looker looker : lookers) {
-                    String[] paths = looker.nodes;
-                    String attribute = looker.attribute;
-                    String expectedValue = looker.value;
-
-                    Axml.Node foundNode = findAxmlNode(axml.firsts, paths);
-                    if (foundNode == null) {
-                        String pathsAsStr = String.join("/", paths);
-                        result.add(new NodeNotFoundResult(pathsAsStr));
-                        continue;
-                    }
-
-                    Axml.Node.Attr attr = findAxmlAttr(foundNode.attrs, nses, attribute);
-                    if (attr == null) {
-                        String pathsAsStr = String.join("/", paths);
-                        result.add(new AttrNotFoundResult(pathsAsStr, attribute));
-                        continue;
-                    }
-
-                    String actualValue = String.valueOf(attr.value);
-                    if (!Objects.equals(actualValue, expectedValue)) {
-                        String pathsAsStr = String.join("/", paths);
-                        result.add(new InvalidValueResult(pathsAsStr, actualValue, expectedValue));
-                        continue;
-                    }
-
-                    //do nothing, everything okay
+                Axml.Node.Attr attr = findAxmlAttr(foundNode.attrs, nses, attribute);
+                if (attr == null) {
+                    String pathsAsStr = String.join("/", paths);
+                    result.add(new AttrNotFoundResult(pathsAsStr, attribute));
+                    continue;
                 }
-            }
-            catch (IOException ex) {
-                exceptions.add(ex);
-            }
-            finally {
-                if (inputStream != null) {
-                    try {
-                        inputStream.close();
-                    }
-                    catch (IOException ex) {
-                        exceptions.add(ex);
-                    }
+
+                String actualValue = String.valueOf(attr.value);
+                if (!Objects.equals(actualValue, expectedValue)) {
+                    String pathsAsStr = String.join("/", paths);
+                    result.add(new InvalidValueResult(pathsAsStr, actualValue, expectedValue));
+                    continue;
                 }
+
+                //do nothing, everything okay
             }
         }
         catch (IOException ex) {
             exceptions.add(ex);
         }
         finally {
-            if (jarFile != null) {
+            if (inputStream != null) {
                 try {
-                    jarFile.close();
+                    inputStream.close();
                 }
                 catch (IOException ex) {
                     exceptions.add(ex);

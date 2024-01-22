@@ -15,13 +15,14 @@ import java.util.*;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import com.am1goo.bloodseeker.android.AppContext;
 import com.am1goo.bloodseeker.android.IResult;
 import com.am1goo.bloodseeker.android.ITrail;
 import com.am1goo.bloodseeker.android.Utilities;
 
 import dalvik.system.DexFile;
 
-public class PackageNameTrail implements ITrail {
+public class PackageNameTrail extends BaseTrail {
 
 	private final String[] packageNames;
 	
@@ -34,12 +35,12 @@ public class PackageNameTrail implements ITrail {
 	}
 	
 	@Override
-	public void seek(List<IResult> result, List<Exception> exceptions) {
+	public void seek(AppContext context, List<IResult> result, List<Exception> exceptions) {
 		if (packageNames == null)
 			return;
 
 		try {
-			Set<String> foundPackages = findPackageName(packageNames, exceptions);
+			Set<String> foundPackages = findPackageName(context, packageNames, exceptions);
 			for (String foundPackage : foundPackages) {
 				result.add(new Result(foundPackage));
 			}
@@ -52,52 +53,29 @@ public class PackageNameTrail implements ITrail {
 		}
 	}
 
-	private Set<String> findPackageName(String[] packageNames, List<Exception> exceptions) {
-		Activity activity = null;
-		try{
-			activity = Utilities.getUnityPlayerActivity();
-		}
-		catch (Exception ex) {
-			exceptions.add(ex);
-		}
-
+	private Set<String> findPackageName(AppContext context, String[] packageNames, List<Exception> exceptions) {
+		Activity activity = context.getActivity();
 		if (activity == null)
 			return new HashSet<String>();
 
-		Set<String> results = new HashSet<String>();
-		Context ctx = activity.getBaseContext();
-		ApplicationInfo appInfo = ctx.getApplicationInfo();
-		JarFile jarFile = null;
-		try {
-			jarFile = new JarFile(appInfo.sourceDir);
-			findPackageName(packageNames, jarFile, "classes.dex", results, exceptions);
+		JarFile jarFile = context.getBaseApk();
+		if (jarFile == null)
+			return new HashSet<String>();
 
-			boolean next = true;
-			int nextIndex = 2;
-			while (next) {
-				boolean found = findPackageName(packageNames, jarFile, "classes" + nextIndex + ".dex", results, exceptions);
-				if (found) {
-					nextIndex++;
-				}
-				else {
-					next = false;
-				}
-			}
-			return results;
-		}
-		catch (IOException ex) {
-			exceptions.add(ex);
-			return results;
-		}
-		finally {
-			if (jarFile != null) {
-				try {
-					jarFile.close();
-				} catch (IOException ex) {
-					exceptions.add(ex);
-				}
+		Set<String> results = new HashSet<String>();
+		findPackageName(packageNames, jarFile, "classes.dex", results, exceptions);
+
+		boolean next = true;
+		int nextIndex = 2;
+		while (next) {
+			boolean found = findPackageName(packageNames, jarFile, "classes" + nextIndex + ".dex", results, exceptions);
+			if (found) {
+				nextIndex++;
+			} else {
+				next = false;
 			}
 		}
+		return results;
 	}
 
 	private static boolean findPackageName(String[] packageNames, JarFile jarFile, String filename, Set<String> results, List<Exception> exceptions) {
