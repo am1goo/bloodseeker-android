@@ -1,24 +1,21 @@
 package com.am1goo.bloodseeker.android.trails;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.util.ArraySet;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 import com.am1goo.bloodseeker.android.AppContext;
 import com.am1goo.bloodseeker.android.IResult;
-import com.am1goo.bloodseeker.android.ITrail;
-import com.am1goo.bloodseeker.android.Utilities;
 
 import dalvik.system.DexFile;
 
@@ -103,6 +100,7 @@ public class PackageNameTrail extends BaseTrail {
 		return true;
 	}
 
+	@SuppressWarnings("deprecation")
 	private static void findPackageName(String[] packageNames, InputStream inputStream, Set<String> results, List<Exception> exceptions) {
 		File tempFile = null;
 		try {

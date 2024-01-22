@@ -1,8 +1,12 @@
 import com.am1goo.bloodseeker.android.AppContext;
+import com.am1goo.bloodseeker.android.AsyncReport;
 import com.am1goo.bloodseeker.android.Bloodseeker;
 import com.am1goo.bloodseeker.android.IResult;
 import com.am1goo.bloodseeker.android.ITrail;
 import com.am1goo.bloodseeker.android.Report;
+import com.am1goo.bloodseeker.android.trails.AndroidManifestXmlTrail;
+import com.am1goo.bloodseeker.android.trails.PackageNameTrail;
+import com.am1goo.bloodseeker.android.trails.PathInApkTrail;
 import com.am1goo.bloodseeker.android.trails.tests.DelayTrail;
 import com.am1goo.bloodseeker.android.Async;
 import com.am1goo.bloodseeker.android.trails.ClassNameTrail;
@@ -15,21 +19,15 @@ import org.junit.Test;
 public class BloodseekerTest {
 
     @Test
-    public void testSeek() {
-        Bloodseeker sdk = new Bloodseeker();
-        sdk.addTrail(new ClassNameTrail("java.util.List"));
-        sdk.addTrail(new ClassNameTrail("java.util.ArrayList"));
-        Report report = sdk.seek();
-        Assert.assertTrue(report.isSuccess());
-    }
-
-    @Test
     public void testSeekAsync() throws InterruptedException {
         Bloodseeker sdk = new Bloodseeker();
         sdk.addTrail(new ClassNameTrail("java.util.List"));
         sdk.addTrail(new ClassNameTrail("java.util.ArrayList"));
+        sdk.addTrail(new ClassNameTrail("com.some.class.Name"));
+        sdk.addTrail(new PackageNameTrail("java.util"));
+        sdk.addTrail(new PathInApkTrail("META-INF/MANIFEST.MF"));
         sdk.addTrail(new DelayTrail(1000));
-        Async<Report> op = new Async<>();
+        Async<Report> op = new AsyncReport();
         sdk.seekAsync(op);
         while (!op.isDone())
             Thread.sleep(10);
@@ -54,8 +52,8 @@ public class BloodseekerTest {
     private boolean seek(ITrail trail) {
         AppContext context = new AppContext(null, null);
 
-        List<IResult> result = new ArrayList();
-        List<Exception> exceptions = new ArrayList();
+        List<IResult> result = new ArrayList<IResult>();
+        List<Exception> exceptions = new ArrayList<Exception>();
         trail.seek(context, result, exceptions);
         return result.size() > 0;
     }

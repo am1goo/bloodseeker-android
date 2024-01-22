@@ -1,16 +1,11 @@
 package com.am1goo.bloodseeker.android.trails;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
 
 import com.am1goo.bloodseeker.android.AppContext;
 import com.am1goo.bloodseeker.android.IResult;
-import com.am1goo.bloodseeker.android.ITrail;
 import com.am1goo.bloodseeker.android.StringUtilities;
-import com.am1goo.bloodseeker.android.Utilities;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -18,6 +13,10 @@ import java.util.zip.ZipEntry;
 public class PathInApkTrail extends BaseTrail {
 
     private final String[] pathsInApk;
+
+    public PathInApkTrail(String pathInApk) {
+        this.pathsInApk = new String[] { pathInApk };
+    }
 
     public PathInApkTrail(String[] pathsInApk) {
         this.pathsInApk = pathsInApk;

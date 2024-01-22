@@ -8,6 +8,14 @@ public class Async<T> {
     private T result;
     private Exception exception;
 
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public T getResult() {
+        return result;
+    }
+
     public void setResult(T result) throws Exception {
         synchronized (lock) {
             if (this.isDone)
@@ -18,6 +26,10 @@ public class Async<T> {
         }
     }
 
+    public Exception getException() {
+        return exception;
+    }
+
     public void setException(Exception exception) {
         synchronized (lock) {
             if (this.isDone)
@@ -26,17 +38,5 @@ public class Async<T> {
             this.isDone = true;
             this.exception = exception;
         }
-    }
-
-    public boolean isDone() {
-        return isDone;
-    }
-
-    public T getResult() {
-        return result;
-    }
-
-    public Exception getException() {
-        return exception;
     }
 }
