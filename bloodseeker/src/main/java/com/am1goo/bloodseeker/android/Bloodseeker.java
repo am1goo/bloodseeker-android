@@ -7,15 +7,18 @@ import android.content.pm.ApplicationInfo;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.jar.JarFile;
 
 public class Bloodseeker {
-	
-	private List<ITrail> trails;
+
+    private final ExecutorService asyncExecutor;
+	private final List<ITrail> trails;
 
     public Bloodseeker() {
-		super();
-		this.trails = new ArrayList<ITrail>();
+        this.asyncExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        this.trails = new ArrayList<ITrail>();
     }
 
     public boolean addTrail(ITrail trail) {
@@ -25,8 +28,19 @@ public class Bloodseeker {
     	return trails.add(trail);
     }
 
-    public Report seek()
-    {
+    public void seekAsync(final Async<Report> holder) {
+        asyncExecutor.execute(() -> {
+            Report report = seek();
+            try {
+                holder.setResult(report);
+            }
+            catch (Exception ex) {
+                holder.setException(ex);
+            }
+        });
+    }
+
+    public Report seek() {
         List<IResult> results = new ArrayList<IResult>();
         List<Exception> exceptions = new ArrayList<Exception>();
 
