@@ -7,6 +7,7 @@ import android.content.pm.ApplicationInfo;
 import com.am1goo.bloodseeker.android.AppContext;
 import com.am1goo.bloodseeker.android.IResult;
 import com.am1goo.bloodseeker.android.ITrail;
+import com.am1goo.bloodseeker.android.StringUtilities;
 import com.am1goo.bloodseeker.android.Utilities;
 
 import java.io.IOException;
@@ -39,6 +40,7 @@ public class PathInApkTrail extends BaseTrail {
             if (pathInApk == null)
                 continue;
 
+            pathInApk = StringUtilities.trim(pathInApk, '/');
             ZipEntry zipEntry = jarFile.getEntry(pathInApk);
             if (zipEntry == null)
                 continue;
