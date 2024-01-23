@@ -2,12 +2,11 @@ package com.am1goo.bloodseeker.android;
 
 import com.am1goo.bloodseeker.android.trails.TrailRunnable;
 import com.am1goo.bloodseeker.android.trails.TrailsManager;
+import com.am1goo.bloodseeker.android.update.RemoteUpdateConfig;
 import com.am1goo.bloodseeker.android.update.RemoteUpdateManager;
 import com.am1goo.bloodseeker.android.update.RemoteUpdateRunnable;
 
 import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -38,25 +37,9 @@ public class Bloodseeker {
     	return trailsManager.addTrail(trail);
     }
 
-    public boolean setUpdateUrl(String url) {
+    public boolean setRemoteUpdateConfig(RemoteUpdateConfig config) {
         try {
-            URI uri = URI.create(url);
-            remoteUpdateManager.setURI(uri);
-            return true;
-        }
-        catch (IllegalArgumentException ex) {
-            exceptions.add(ex);
-            return false;
-        }
-    }
-
-    public boolean setUpdateDecryptKey(String secretKey) {
-        if (secretKey == null)
-            return false;
-
-        try {
-            byte[] bytes = secretKey.getBytes("utf-8");
-            remoteUpdateManager.setSecretKey(bytes);
+            remoteUpdateManager.setConfig(config);
             return true;
         }
         catch (IOException ex) {

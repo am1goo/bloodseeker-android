@@ -173,6 +173,9 @@ public class RemoteUpdateFile {
     }
 
     private static Key generateKey(byte[] secretKey) throws IllegalArgumentException {
+        if (secretKey == null)
+            throw new IllegalArgumentException("secretKey is undefined");
+
         return new SecretKeySpec(secretKey, AES);
     }
 }

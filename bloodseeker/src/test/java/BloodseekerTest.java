@@ -10,6 +10,8 @@ import com.am1goo.bloodseeker.android.trails.tests.DelayTrail;
 import com.am1goo.bloodseeker.android.Async;
 import com.am1goo.bloodseeker.android.trails.ClassNameTrail;
 import com.am1goo.bloodseeker.android.trails.LibraryTrail;
+import com.am1goo.bloodseeker.android.update.RemoteUpdateConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
@@ -20,7 +22,10 @@ public class BloodseekerTest {
     @Test
     public void testSeekAsync() throws InterruptedException {
         Bloodseeker sdk = new Bloodseeker();
-        sdk.setUpdateUrl("https://raw.githubusercontent.com/am1goo/bloodseeker-unity/main/package.json");
+        RemoteUpdateConfig config = new RemoteUpdateConfig();
+        config.setUrl("https://raw.githubusercontent.com/am1goo/bloodseeker-unity/main/package.json");
+        config.setSecretKey("0123456789ABCDEF");
+        sdk.setRemoteUpdateConfig(config);
         sdk.addTrail(new ClassNameTrail("java.util.List"));
         sdk.addTrail(new ClassNameTrail("java.util.ArrayList"));
         sdk.addTrail(new ClassNameTrail("com.some.class.Name"));
@@ -32,6 +37,12 @@ public class BloodseekerTest {
         while (!op.isDone())
             Thread.sleep(10);
         Report report = op.getResult();
+
+        String[] errors = report.getErrors();
+        for (int i = 0; i < errors.length; ++i) {
+            String error = errors[i];
+            System.out.println("Error #" + (i + 1) + ": " + error);
+        }
         Assert.assertTrue(report.isSuccess());
     }
 

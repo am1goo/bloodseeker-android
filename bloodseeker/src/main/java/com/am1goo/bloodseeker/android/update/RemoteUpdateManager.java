@@ -1,16 +1,9 @@
 package com.am1goo.bloodseeker.android.update;
 
-import com.am1goo.bloodseeker.android.ITrail;
 import com.am1goo.bloodseeker.android.trails.TrailsManager;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 public class RemoteUpdateManager {
 
@@ -24,12 +17,12 @@ public class RemoteUpdateManager {
         this.uri = null;
     }
 
-    public void setURI(URI uri) {
-        this.uri = uri;
-    }
+    public void setConfig(RemoteUpdateConfig config) throws IllegalArgumentException, UnsupportedEncodingException {
+        String url = config.getUrl();
+        this.uri = url != null ? URI.create(url) : null;
 
-    public void setSecretKey(byte[] secretKey) {
-        this.secretKey = secretKey;
+        String secretKey = config.getSecretKey();
+        this.secretKey = secretKey != null ? secretKey.getBytes("utf-8") : null;
     }
 
     public RemoteUpdateRunnable getRunnable()
