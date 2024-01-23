@@ -4,7 +4,6 @@ import com.am1goo.bloodseeker.android.Bloodseeker;
 import com.am1goo.bloodseeker.android.IResult;
 import com.am1goo.bloodseeker.android.ITrail;
 import com.am1goo.bloodseeker.android.Report;
-import com.am1goo.bloodseeker.android.trails.AndroidManifestXmlTrail;
 import com.am1goo.bloodseeker.android.trails.PackageNameTrail;
 import com.am1goo.bloodseeker.android.trails.PathInApkTrail;
 import com.am1goo.bloodseeker.android.trails.tests.DelayTrail;
@@ -21,6 +20,7 @@ public class BloodseekerTest {
     @Test
     public void testSeekAsync() throws InterruptedException {
         Bloodseeker sdk = new Bloodseeker();
+        sdk.setUpdateUrl("https://raw.githubusercontent.com/am1goo/bloodseeker-unity/main/package.json");
         sdk.addTrail(new ClassNameTrail("java.util.List"));
         sdk.addTrail(new ClassNameTrail("java.util.ArrayList"));
         sdk.addTrail(new ClassNameTrail("com.some.class.Name"));

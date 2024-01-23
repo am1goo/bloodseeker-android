@@ -65,4 +65,20 @@ public class Utilities {
         outputStream.flush();
         return outputStream.toByteArray();
     }
+
+    public static String readAllText(InputStream inputStream) {
+        try {
+            int bufferSize = 1024;
+            char[] buffer = new char[bufferSize];
+            StringBuilder out = new StringBuilder();
+            java.io.Reader in = new java.io.InputStreamReader(inputStream);
+            for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+                out.append(buffer, 0, numRead);
+            }
+            return out.toString();
+        }
+        catch (Exception ex) {
+            return "";
+        }
+    }
 }

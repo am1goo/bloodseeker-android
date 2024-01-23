@@ -1,36 +1,52 @@
 package com.am1goo.bloodseeker.android;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
+import com.am1goo.bloodseeker.android.trails.TrailRunnable;
+import com.am1goo.bloodseeker.android.trails.TrailsManager;
+import com.am1goo.bloodseeker.android.update.RemoteUpdateManager;
+import com.am1goo.bloodseeker.android.update.RemoteUpdateRunnable;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.jar.JarFile;
 
 public class Bloodseeker {
 
     private final ExecutorService asyncExecutor;
-	private final List<ITrail> trails;
+    private final TrailsManager trailsManager;
+    private final RemoteUpdateManager remoteUpdateManager;
+    private final List<Exception> exceptions;
+    private boolean isUpdating;
     private boolean isSeeking;
     private boolean isShutdown;
 
     public Bloodseeker() {
         this.asyncExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        this.trails = new ArrayList<ITrail>();
+        this.trailsManager = new TrailsManager(asyncExecutor);
+        this.remoteUpdateManager = new RemoteUpdateManager(trailsManager);
+        this.exceptions= new ArrayList<>();
+        this.isUpdating = false;
         this.isSeeking = false;
         this.isShutdown = false;
     }
 
     public boolean addTrail(ITrail trail) {
-    	if (trail == null)
-    		return false;
+    	return trailsManager.addTrail(trail);
+    }
 
-    	return trails.add(trail);
+    public boolean setUpdateUrl(String url) {
+        try {
+            URI uri = URI.create(url);
+            remoteUpdateManager.setURI(uri);
+            return true;
+        }
+        catch (IllegalArgumentException ex) {
+            exceptions.add(ex);
+            return false;
+        }
     }
 
     public void seekAsync(final Async<Report> asyncReport) {
@@ -39,81 +55,59 @@ public class Bloodseeker {
             return;
         }
 
+        if (isUpdating) {
+            asyncReport.setException(new Exception("this instance is updating"));
+            return;
+        }
+
         if (isSeeking) {
             asyncReport.setException(new Exception("this instance is already running"));
             return;
         }
 
-        isSeeking = true;
-        final int trailsCount = trails.size();
-        if (trailsCount == 0) {
-            Report report = new Report(null, null);
-            try {
-                asyncReport.setResult(report);
-            }
-            catch (Exception ex) {
-                asyncReport.setException(ex);
-            }
-            onShutdown();
-            return;
-        }
+        final List<IResult> results = new ArrayList<>();
+        final List<Exception> exceptions = new ArrayList<>();
+        exceptions.addAll(this.exceptions);
 
-        final List<IResult> results = new ArrayList<IResult>();
-        final List<Exception> exceptions = new ArrayList<Exception>();
+        isUpdating = true;
+        asyncExecutor.execute(() -> {
+            RemoteUpdateRunnable updateRunnable = remoteUpdateManager.getRunnable();
+            updateRunnable.run();
+            exceptions.addAll(updateRunnable.getExceptions());
+            isUpdating = false;
 
-        Activity activity;
-        try {
-            activity = Utilities.getUnityPlayerActivity();
-        }
-        catch (Exception ex) {
-            exceptions.add(ex);
-            activity = null;
-        }
+            isSeeking = true;
 
-        final JarFile baseApk = Utilities.getBaseApk(activity, exceptions);
-        final AppContext asyncContext = new AppContext(activity, baseApk);
-        final AtomicInteger completedCounter = new AtomicInteger(0);
+            final List<TrailRunnable> trails = trailsManager.createTasks();
+            final int trailsCount = trails.size();
 
-        final Object lock = new Object();
-        for (int i = 0; i < trailsCount; ++i) {
-            final ITrail trail = trails.get(i);
-            asyncExecutor.execute(()-> {
-                List<IResult> asyncResult = new ArrayList<>();
-                List<Exception> asyncExceptions = new ArrayList<>();
+            final Object lock = new Object();
+            final AtomicInteger completedCounter = new AtomicInteger(0);
 
-                long startTime = System.currentTimeMillis();
-                trail.seek(asyncContext, asyncResult, asyncExceptions);
-                long endTime = System.currentTimeMillis();
-                long milliseconds = (endTime - startTime);
+            for (TrailRunnable runnable : trails) {
+                asyncExecutor.execute(() -> {
+                    runnable.run();
 
-                synchronized (lock) {
-                    results.addAll(asyncResult);
-                    exceptions.addAll(asyncExceptions);
-                    System.out.println("Thread #" + Thread.currentThread().getId() + ": " + trail.getClass() + " completed in " + milliseconds + " ms");
+                    synchronized (lock) {
+                        results.addAll(runnable.getResults());
+                        exceptions.addAll(runnable.getExceptions());
 
-                    int completedCount = completedCounter.incrementAndGet();
-                    if (completedCount < trailsCount)
-                        return;
+                        int completedCount = completedCounter.incrementAndGet();
+                        if (completedCount < trailsCount)
+                            return;
 
-                    Report report = new Report(results, exceptions);
-                    try {
-                        asyncReport.setResult(report);
-                    }
-                    catch (Exception ex) {
-                        asyncReport.setException(ex);
-                    }
-                    if (baseApk != null) {
+                        Report report = new Report(results, exceptions);
                         try {
-                            baseApk.close();
+                            asyncReport.setResult(report);
+                        } catch (Exception ex) {
+                            asyncReport.setException(ex);
                         }
-                        catch (IOException ex) {
-                            exceptions.add(ex);
-                        }
+                        trailsManager.completeTasks();
+                        onShutdown();
                     }
-                    onShutdown();
-                }
-            });
-        }
+                });
+            }
+        });
     }
 
     private void onShutdown() {
