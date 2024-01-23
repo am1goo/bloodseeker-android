@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -16,12 +17,19 @@ import java.util.zip.ZipEntry;
 
 import com.am1goo.bloodseeker.android.AppContext;
 import com.am1goo.bloodseeker.android.IResult;
+import com.am1goo.bloodseeker.android.update.IRemoteUpdateTrail;
+import com.am1goo.bloodseeker.android.update.RemoteUpdateFile;
+import com.am1goo.bloodseeker.android.update.RemoteUpdateReader;
+import com.am1goo.bloodseeker.android.update.RemoteUpdateWriter;
 
 import dalvik.system.DexFile;
 
-public class PackageNameTrail extends BaseTrail {
+public class PackageNameTrail extends BaseTrail implements IRemoteUpdateTrail {
 
-	private final String[] packageNames;
+	private String[] packageNames;
+
+	public PackageNameTrail() {
+	}
 	
 	public PackageNameTrail(String packageName) {
 		this( new String[] { packageName } );
@@ -30,7 +38,32 @@ public class PackageNameTrail extends BaseTrail {
 	public PackageNameTrail(String[] packageNames) {
 		this.packageNames = packageNames;
 	}
-	
+
+	@Override
+	public void load(RemoteUpdateReader reader) throws IOException {
+		packageNames = reader.readStringArray();
+	}
+
+	@Override
+	public void save(RemoteUpdateWriter writer) throws IOException {
+		writer.writeStringArray(packageNames, RemoteUpdateFile.CHARSET_NAME);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		PackageNameTrail that = (PackageNameTrail) o;
+		return Arrays.equals(packageNames, that.packageNames);
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(packageNames);
+	}
+
 	@Override
 	public void seek(AppContext context, List<IResult> result, List<Exception> exceptions) {
 		if (packageNames == null)

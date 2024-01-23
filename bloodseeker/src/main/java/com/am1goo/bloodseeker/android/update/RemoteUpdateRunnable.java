@@ -14,11 +14,13 @@ import java.util.List;
 
 public class RemoteUpdateRunnable implements Runnable {
     final URI uri;
+    final byte[] secretKey;
     final private TrailsManager trailsManager;
     final List<Exception> exceptions;
 
-    public RemoteUpdateRunnable(URI uri, TrailsManager trailsManager) {
+    public RemoteUpdateRunnable(URI uri, byte[] secretKey, TrailsManager trailsManager) {
         this.uri = uri;
+        this.secretKey = secretKey;
         this.trailsManager = trailsManager;
         this.exceptions = new ArrayList<>();
     }
@@ -66,7 +68,17 @@ public class RemoteUpdateRunnable implements Runnable {
         return trails;
     }
 
-    private static void loadFromFile(InputStream inputStream, List<ITrail> result) {
-        //TODO: deserialize and copy files here
+    private void loadFromFile(InputStream inputStream, List<ITrail> result) {
+        RemoteUpdateFile file;
+        try {
+            file = new RemoteUpdateFile(secretKey);
+            file.load(inputStream);
+        }
+        catch (Exception ex) {
+            exceptions.add(ex);
+            return;
+        }
+
+        result.addAll(file.getTrails());
     }
 }

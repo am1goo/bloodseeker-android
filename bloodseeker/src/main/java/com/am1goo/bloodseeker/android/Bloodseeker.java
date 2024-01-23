@@ -7,6 +7,7 @@ import com.am1goo.bloodseeker.android.update.RemoteUpdateRunnable;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -44,6 +45,21 @@ public class Bloodseeker {
             return true;
         }
         catch (IllegalArgumentException ex) {
+            exceptions.add(ex);
+            return false;
+        }
+    }
+
+    public boolean setUpdateDecryptKey(String secretKey) {
+        if (secretKey == null)
+            return false;
+
+        try {
+            byte[] bytes = secretKey.getBytes("utf-8");
+            remoteUpdateManager.setSecretKey(bytes);
+            return true;
+        }
+        catch (IOException ex) {
             exceptions.add(ex);
             return false;
         }

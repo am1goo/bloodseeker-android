@@ -15,13 +15,12 @@ import java.util.List;
 public class RemoteUpdateManager {
 
     private final TrailsManager trailsManager;
-    private final List<Exception> exceptions;
 
     private URI uri;
+    private byte[] secretKey;
 
     public RemoteUpdateManager(TrailsManager trailsManager) {
         this.trailsManager = trailsManager;
-        this.exceptions = new ArrayList<>();
         this.uri = null;
     }
 
@@ -29,8 +28,12 @@ public class RemoteUpdateManager {
         this.uri = uri;
     }
 
+    public void setSecretKey(byte[] secretKey) {
+        this.secretKey = secretKey;
+    }
+
     public RemoteUpdateRunnable getRunnable()
     {
-        return new RemoteUpdateRunnable(uri, trailsManager);
+        return new RemoteUpdateRunnable(uri, secretKey, trailsManager);
     }
 }
