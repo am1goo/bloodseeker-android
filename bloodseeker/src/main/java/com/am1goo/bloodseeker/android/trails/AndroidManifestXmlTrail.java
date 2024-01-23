@@ -35,6 +35,10 @@ public class AndroidManifestXmlTrail extends BaseTrail {
     private final Looker[] lookers;
     private final List<Exception> exceptions;
 
+    public AndroidManifestXmlTrail(String json) {
+        this(new String[] { json } );
+    }
+
     public AndroidManifestXmlTrail(String[] jsons) {
         this.lookers = new Looker[jsons.length];
         this.exceptions = new ArrayList<Exception>();

@@ -15,7 +15,7 @@ public class PathInApkTrail extends BaseTrail {
     private final String[] pathsInApk;
 
     public PathInApkTrail(String pathInApk) {
-        this.pathsInApk = new String[] { pathInApk };
+        this( new String[] { pathInApk } );
     }
 
     public PathInApkTrail(String[] pathsInApk) {

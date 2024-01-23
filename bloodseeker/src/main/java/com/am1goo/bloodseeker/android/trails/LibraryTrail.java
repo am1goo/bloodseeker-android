@@ -11,7 +11,7 @@ public class LibraryTrail extends BaseTrail {
 	private final String[] libraryNames;
 	
 	public LibraryTrail(String libraryName) {
-		this.libraryNames = new String[] { libraryName };
+		this(new String[] { libraryName } );
 	}
 	
 	public LibraryTrail(String[] libraryNames) {

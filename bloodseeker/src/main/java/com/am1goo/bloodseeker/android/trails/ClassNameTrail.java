@@ -12,7 +12,7 @@ public class ClassNameTrail extends BaseTrail {
 	private final String[] classNames;
 	
 	public ClassNameTrail(String className) {
-		this.classNames = new String[] { className };
+		this(new String[] { className } );
 	}
 	
 	public ClassNameTrail(String[] classNames) {

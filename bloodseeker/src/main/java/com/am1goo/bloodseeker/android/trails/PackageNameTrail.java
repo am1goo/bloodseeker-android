@@ -24,7 +24,7 @@ public class PackageNameTrail extends BaseTrail {
 	private final String[] packageNames;
 	
 	public PackageNameTrail(String packageName) {
-		this.packageNames = new String[] { packageName };
+		this( new String[] { packageName } );
 	}
 	
 	public PackageNameTrail(String[] packageNames) {
