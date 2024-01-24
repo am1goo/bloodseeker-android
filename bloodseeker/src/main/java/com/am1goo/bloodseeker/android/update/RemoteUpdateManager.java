@@ -11,6 +11,7 @@ public class RemoteUpdateManager {
 
     private URI uri;
     private byte[] secretKey;
+    private long cacheTTL;
 
     public RemoteUpdateManager(TrailsManager trailsManager) {
         this.trailsManager = trailsManager;
@@ -23,10 +24,12 @@ public class RemoteUpdateManager {
 
         String secretKey = config.getSecretKey();
         this.secretKey = secretKey != null ? secretKey.getBytes("utf-8") : null;
+
+        this.cacheTTL = config.getCacheTTL();
     }
 
     public RemoteUpdateRunnable getRunnable()
     {
-        return new RemoteUpdateRunnable(uri, secretKey, trailsManager);
+        return new RemoteUpdateRunnable(uri, secretKey, cacheTTL, trailsManager);
     }
 }

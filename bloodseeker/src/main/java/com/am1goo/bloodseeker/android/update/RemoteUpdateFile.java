@@ -23,6 +23,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class RemoteUpdateFile {
 
+    public static final String EXTENSION = ".bmx";
     public static final byte[] HEADER_BYTES = new byte[] { 66, 77, 88, 63 };
     public static final short VERSION = 1;
     public static final String CHARSET_NAME = getDefaultCharset();

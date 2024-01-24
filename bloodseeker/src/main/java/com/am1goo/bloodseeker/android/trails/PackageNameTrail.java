@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -138,7 +139,7 @@ public class PackageNameTrail extends BaseTrail implements IRemoteUpdateTrail {
 		File tempFile = null;
 		try {
 			tempFile = File.createTempFile("classes", ".dex");
-			OutputStream outputStream = new FileOutputStream(tempFile);
+			OutputStream outputStream = Files.newOutputStream(tempFile.toPath());
 
 			byte[] buffer = new byte[8 * 1024];
 			int bytesRead;

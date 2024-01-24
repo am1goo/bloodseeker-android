@@ -4,6 +4,7 @@ public class RemoteUpdateConfig {
 
     private String url;
     private String secretKey;
+    private long cacheTTL;
 
     public String getUrl() {
         return url;
@@ -19,5 +20,13 @@ public class RemoteUpdateConfig {
 
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
+    }
+
+    public long getCacheTTL() {
+        return cacheTTL;
+    }
+
+    public void setCacheTTL(long cacheTTL) {
+        this.cacheTTL = cacheTTL;
     }
 }
