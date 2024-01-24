@@ -51,6 +51,10 @@ public class TrailsManager {
         return trails.add(trail);
     }
 
+    public List<ITrail> getTrails() {
+        return trails;
+    }
+
     public List<TrailRunnable> createTasks() {
         final List<TrailRunnable> runnables = new ArrayList<>();
 

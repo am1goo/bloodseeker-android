@@ -48,6 +48,15 @@ public class Bloodseeker {
         }
     }
 
+    public byte[] bake() {
+        try {
+            return remoteUpdateManager.exportToBytes();
+        }
+        catch (Exception ex) {
+            return null;
+        }
+    }
+
     public void seekAsync(final Async<Report> asyncReport) {
         if (isShutdown) {
             asyncReport.setException(new Exception("this instance is shutdown"));
