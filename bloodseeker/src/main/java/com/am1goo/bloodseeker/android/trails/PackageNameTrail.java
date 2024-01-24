@@ -3,7 +3,6 @@ package com.am1goo.bloodseeker.android.trails;
 import android.app.Activity;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,16 +15,16 @@ import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import com.am1goo.bloodseeker.android.AppContext;
-import com.am1goo.bloodseeker.android.IResult;
-import com.am1goo.bloodseeker.android.update.IRemoteUpdateTrail;
-import com.am1goo.bloodseeker.android.update.RemoteUpdateFile;
-import com.am1goo.bloodseeker.android.update.RemoteUpdateReader;
-import com.am1goo.bloodseeker.android.update.RemoteUpdateWriter;
+import com.am1goo.bloodseeker.android.AndroidAppContext;
+import com.am1goo.bloodseeker.IResult;
+import com.am1goo.bloodseeker.update.IRemoteUpdateTrail;
+import com.am1goo.bloodseeker.update.RemoteUpdateFile;
+import com.am1goo.bloodseeker.update.RemoteUpdateReader;
+import com.am1goo.bloodseeker.update.RemoteUpdateWriter;
 
 import dalvik.system.DexFile;
 
-public class PackageNameTrail extends BaseTrail implements IRemoteUpdateTrail {
+public class PackageNameTrail extends BaseAndroidTrail implements IRemoteUpdateTrail {
 
 	private String[] packageNames;
 
@@ -66,8 +65,12 @@ public class PackageNameTrail extends BaseTrail implements IRemoteUpdateTrail {
 	}
 
 	@Override
-	public void seek(AppContext context, List<IResult> result, List<Exception> exceptions) {
+	public void seek(List<IResult> result, List<Exception> exceptions) {
 		if (packageNames == null)
+			return;
+
+		AndroidAppContext context = getContext();
+		if (context == null)
 			return;
 
 		try {
@@ -84,7 +87,7 @@ public class PackageNameTrail extends BaseTrail implements IRemoteUpdateTrail {
 		}
 	}
 
-	private Set<String> findPackageName(AppContext context, String[] packageNames, List<Exception> exceptions) {
+	private Set<String> findPackageName(AndroidAppContext context, String[] packageNames, List<Exception> exceptions) {
 		Activity activity = context.getActivity();
 		if (activity == null)
 			return new HashSet<String>();

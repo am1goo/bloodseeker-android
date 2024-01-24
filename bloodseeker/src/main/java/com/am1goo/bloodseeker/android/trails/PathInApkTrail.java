@@ -2,13 +2,13 @@ package com.am1goo.bloodseeker.android.trails;
 
 import android.app.Activity;
 
-import com.am1goo.bloodseeker.android.AppContext;
-import com.am1goo.bloodseeker.android.IResult;
-import com.am1goo.bloodseeker.android.StringUtilities;
-import com.am1goo.bloodseeker.android.update.IRemoteUpdateTrail;
-import com.am1goo.bloodseeker.android.update.RemoteUpdateFile;
-import com.am1goo.bloodseeker.android.update.RemoteUpdateReader;
-import com.am1goo.bloodseeker.android.update.RemoteUpdateWriter;
+import com.am1goo.bloodseeker.android.AndroidAppContext;
+import com.am1goo.bloodseeker.IResult;
+import com.am1goo.bloodseeker.utilities.StringUtilities;
+import com.am1goo.bloodseeker.update.IRemoteUpdateTrail;
+import com.am1goo.bloodseeker.update.RemoteUpdateFile;
+import com.am1goo.bloodseeker.update.RemoteUpdateReader;
+import com.am1goo.bloodseeker.update.RemoteUpdateWriter;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-public class PathInApkTrail extends BaseTrail implements IRemoteUpdateTrail {
+public class PathInApkTrail extends BaseAndroidTrail implements IRemoteUpdateTrail {
 
     private String[] pathsInApk;
 
@@ -57,8 +57,12 @@ public class PathInApkTrail extends BaseTrail implements IRemoteUpdateTrail {
     }
 
     @Override
-    public void seek(AppContext context, List<IResult> result, List<Exception> exceptions) {
+    public void seek(List<IResult> result, List<Exception> exceptions) {
         if (pathsInApk == null)
+            return;
+
+        AndroidAppContext context = getContext();
+        if (context == null)
             return;
 
         Activity activity = context.getActivity();

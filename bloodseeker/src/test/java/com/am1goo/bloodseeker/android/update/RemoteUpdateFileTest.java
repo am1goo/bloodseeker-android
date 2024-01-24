@@ -1,9 +1,11 @@
 package com.am1goo.bloodseeker.android.update;
 
-import com.am1goo.bloodseeker.android.trails.ClassNameTrail;
+import com.am1goo.bloodseeker.trails.ClassNameTrail;
 import com.am1goo.bloodseeker.android.trails.PackageNameTrail;
 import com.am1goo.bloodseeker.android.trails.PathInApkTrail;
-import com.am1goo.bloodseeker.android.trails.tests.DelayTrail;
+import com.am1goo.bloodseeker.trails.DelayTrail;
+import com.am1goo.bloodseeker.update.IRemoteUpdateTrail;
+import com.am1goo.bloodseeker.update.RemoteUpdateFile;
 
 import org.junit.Assert;
 import org.junit.Test;

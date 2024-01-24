@@ -1,13 +1,10 @@
 package com.am1goo.bloodseeker.android.trails;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
 
-import com.am1goo.bloodseeker.android.AppContext;
-import com.am1goo.bloodseeker.android.IResult;
-import com.am1goo.bloodseeker.android.ITrail;
-import com.am1goo.bloodseeker.android.Utilities;
+import com.am1goo.bloodseeker.android.AndroidAppContext;
+import com.am1goo.bloodseeker.IResult;
+import com.am1goo.bloodseeker.utilities.IOUtilities;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,7 +24,7 @@ import java.util.zip.ZipEntry;
 import pxb.android.axml.Axml;
 import pxb.android.axml.AxmlReader;
 
-public class AndroidManifestXmlTrail extends BaseTrail {
+public class AndroidManifestXmlTrail extends BaseAndroidTrail {
 
     private static final String androidManifestFilename = "AndroidManifest.xml";
     private static final String androidManifestNamespace = "http://schemas.android.com/apk/res/android";
@@ -69,8 +66,12 @@ public class AndroidManifestXmlTrail extends BaseTrail {
     }
 
     @Override
-    public void seek(AppContext context, List<IResult> result, List<Exception> exceptions) {
+    public void seek(List<IResult> result, List<Exception> exceptions) {
         exceptions.addAll(this.exceptions);
+
+        AndroidAppContext context = getContext();
+        if (context == null)
+            return;
 
         Activity activity = context.getActivity();
         if (activity == null)
@@ -90,7 +91,7 @@ public class AndroidManifestXmlTrail extends BaseTrail {
         try {
             inputStream = jarFile.getInputStream(zipEntry);
 
-            byte[] bytes = Utilities.readAllBytes(inputStream);
+            byte[] bytes = IOUtilities.readAllBytes(inputStream);
             AxmlReader reader = new AxmlReader(bytes);
             Axml axml = new Axml();
             reader.accept(axml);
