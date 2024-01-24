@@ -51,9 +51,6 @@ public class RemoteUpdateManager {
 
     public byte[] exportToBytes() throws Exception {
         RemoteUpdateFile file = exportToFile();
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            file.save(outputStream);
-            return outputStream.toByteArray();
-        }
+        return file.toByteArray();
     }
 }

@@ -111,6 +111,13 @@ public class RemoteUpdateFile {
         writer.writeBytes(payload);
     }
 
+    public byte[] toByteArray() throws Exception {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            save(outputStream);
+            return outputStream.toByteArray();
+        }
+    }
+
     private byte[] decode(byte[] bytes, byte cipher) throws Exception {
         switch (cipher) {
             case CYPHER_NONE:

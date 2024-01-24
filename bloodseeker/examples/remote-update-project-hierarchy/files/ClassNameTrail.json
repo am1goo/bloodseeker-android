@@ -1,0 +1,7 @@
+{
+	"classNames": [
+		"java.util.List",
+		"java.util.ArrayList",
+		"com.some.class.Name"
+	]
+}

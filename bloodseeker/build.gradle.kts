@@ -43,6 +43,7 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation(files("libs/axml-2.1.3.jar"))
     implementation(files("libs/slf4j-api-1.7.5.jar"))
+    implementation(files("libs/gson-2.10.1.jar"))
     testImplementation("junit:junit:4.12")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

@@ -1,0 +1,16 @@
+{
+	"secretKey": "0123456789ABCDEF",
+	"files": [{
+		"className": "com.am1goo.bloodseeker.trails.ClassNameTrail",
+		"path": "files/ClassNameTrail.json"
+	}, {
+		"className": "com.am1goo.bloodseeker.trails.LibraryTrail",
+		"path": "files/LibraryTrail.json"
+	}, {
+		"className": "com.am1goo.bloodseeker.android.trails.PathInApkTrail",
+		"path": "files/android/PathInApkTrail.json"
+	}, {
+		"className": "com.am1goo.bloodseeker.android.trails.PackageNameTrail",
+		"path": "files/android/PackageNameTrail.json"
+	}]
+}

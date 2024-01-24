@@ -8,7 +8,7 @@ import java.util.List;
 
 public class BaseAndroidTrail implements IAndroidTrail {
 
-    private AndroidAppContext context;
+    private transient AndroidAppContext context;
 
     @Override
     public void seek(List<IResult> result, List<Exception> exceptions) {

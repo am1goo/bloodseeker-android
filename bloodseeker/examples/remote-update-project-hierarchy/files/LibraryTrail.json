@@ -1,0 +1,7 @@
+{
+	"libraryNames": [
+		"java.util",
+		"java.util.collections",
+		"com.some.package"
+	]
+}
