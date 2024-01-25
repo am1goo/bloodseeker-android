@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface ITrail {
 
-	 void seek(List<IResult> result, List<Exception> exceptions);
+	 void seek(List<IResult> result, BloodseekerExceptions exceptions);
 }

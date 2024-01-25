@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.android.AndroidAppContext;
 import com.am1goo.bloodseeker.IResult;
 import com.am1goo.bloodseeker.update.IRemoteUpdateTrail;
@@ -65,7 +66,7 @@ public class PackageNameTrail extends BaseAndroidTrail implements IRemoteUpdateT
 	}
 
 	@Override
-	public void seek(List<IResult> result, List<Exception> exceptions) {
+	public void seek(List<IResult> result, BloodseekerExceptions exceptions) {
 		if (packageNames == null)
 			return;
 
@@ -80,14 +81,14 @@ public class PackageNameTrail extends BaseAndroidTrail implements IRemoteUpdateT
 			}
 		}
 		catch (Exception ex) {
-			exceptions.add(ex);
+			exceptions.add(this, ex);
 		}
 		catch (Error err) {
-			exceptions.add(new Exception(err));
+			exceptions.add(this, new Exception(err));
 		}
 	}
 
-	private Set<String> findPackageName(AndroidAppContext context, String[] packageNames, List<Exception> exceptions) {
+	private Set<String> findPackageName(AndroidAppContext context, String[] packageNames, BloodseekerExceptions exceptions) {
 		Activity activity = context.getActivity();
 		if (activity == null)
 			return new HashSet<String>();
@@ -112,7 +113,7 @@ public class PackageNameTrail extends BaseAndroidTrail implements IRemoteUpdateT
 		return results;
 	}
 
-	private static boolean findPackageName(String[] packageNames, JarFile jarFile, String filename, Set<String> results, List<Exception> exceptions) {
+	private static boolean findPackageName(String[] packageNames, JarFile jarFile, String filename, Set<String> results, BloodseekerExceptions exceptions) {
 		ZipEntry zipEntry = jarFile.getEntry(filename);
 		if (zipEntry == null)
 			return false;
@@ -121,7 +122,7 @@ public class PackageNameTrail extends BaseAndroidTrail implements IRemoteUpdateT
 		try {
 			inputStream = jarFile.getInputStream(zipEntry);
 		} catch (IOException ex) {
-			exceptions.add(ex);
+			exceptions.add(PackageNameTrail.class, ex);
 		}
 
 		if (inputStream == null)
@@ -132,13 +133,13 @@ public class PackageNameTrail extends BaseAndroidTrail implements IRemoteUpdateT
 		try {
 			inputStream.close();
 		} catch (IOException ex) {
-			exceptions.add(ex);
+			exceptions.add(PackageNameTrail.class, ex);
 		}
 		return true;
 	}
 
 	@SuppressWarnings("deprecation")
-	private static void findPackageName(String[] packageNames, InputStream inputStream, Set<String> results, List<Exception> exceptions) {
+	private static void findPackageName(String[] packageNames, InputStream inputStream, Set<String> results, BloodseekerExceptions exceptions) {
 		File tempFile = null;
 		try {
 			tempFile = File.createTempFile("classes", ".dex");
@@ -167,7 +168,7 @@ public class PackageNameTrail extends BaseAndroidTrail implements IRemoteUpdateT
 			}
 		}
 		catch (IOException ex) {
-			exceptions.add(ex);
+			exceptions.add(PackageNameTrail.class, ex);
 		}
 		finally {
 			if (tempFile != null) {

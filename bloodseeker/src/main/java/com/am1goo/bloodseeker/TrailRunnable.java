@@ -7,13 +7,13 @@ public class TrailRunnable implements Runnable {
 
     private final ITrail trail;
     private final List<IResult> results;
-    private final List<Exception> exceptions;
+    private final BloodseekerExceptions exceptions;
 
     public TrailRunnable(ITrail trail) {
-        this(trail, new ArrayList<>(), new ArrayList<>());
+        this(trail, new ArrayList<>(), new BloodseekerExceptions());
     }
 
-    protected TrailRunnable(ITrail trail, List<IResult> results, List<Exception> exceptions) {
+    protected TrailRunnable(ITrail trail, List<IResult> results, BloodseekerExceptions exceptions) {
         this.trail = trail;
         this.results = results;
         this.exceptions = exceptions;
@@ -23,7 +23,7 @@ public class TrailRunnable implements Runnable {
         return results;
     }
 
-    public List<Exception> getExceptions() {
+    public BloodseekerExceptions getExceptions() {
         return exceptions;
     }
 

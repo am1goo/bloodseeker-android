@@ -1,6 +1,10 @@
 package com.am1goo.bloodseeker.utilities;
 
+import java.util.Random;
+
 public class StringUtilities {
+
+    private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
 
     public static String trimAtStart(String str, Character c) {
         if (str == null)
@@ -50,5 +54,16 @@ public class StringUtilities {
 
     public static String trim(String str, Character c) {
         return trimAtStart(trimAtEnd(str, c), c);
+    }
+
+    public static String getRandomString(int length) {
+        Random random = new Random();
+
+        char[] chars = new char[length];
+        for (int i = 0; i < length; ++i) {
+            int index = random.nextInt(ALPHABET.length());
+            chars[i] = ALPHABET.charAt(index);
+        }
+        return String.valueOf(chars);
     }
 }

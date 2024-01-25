@@ -1,5 +1,7 @@
 package com.am1goo.bloodseeker.update;
 
+import com.am1goo.bloodseeker.BloodseekerException;
+import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.ITrail;
 import com.am1goo.bloodseeker.trails.TrailsManager;
 import com.am1goo.bloodseeker.utilities.DateUtilities;
@@ -32,7 +34,7 @@ public class RemoteUpdateRunnable implements IRemoteUpdateRunnable {
     final byte[] secretKey;
     final long cacheTTL;
     final private TrailsManager trailsManager;
-    final protected List<Exception> exceptions;
+    final protected BloodseekerExceptions exceptions;
     final private File cacheDir;
 
     public RemoteUpdateRunnable(URI uri, byte[] secretKey, long cacheTTL, TrailsManager trailsManager) {
@@ -40,7 +42,7 @@ public class RemoteUpdateRunnable implements IRemoteUpdateRunnable {
         this.secretKey = secretKey;
         this.cacheTTL = cacheTTL;
         this.trailsManager = trailsManager;
-        this.exceptions = new ArrayList<>();
+        this.exceptions = new BloodseekerExceptions();
         this.cacheDir = findCacheDir();
     }
 
@@ -50,7 +52,7 @@ public class RemoteUpdateRunnable implements IRemoteUpdateRunnable {
             path = System.getProperty("java.io.tempdir");
         }
         catch (NullPointerException ex) {
-            exceptions.add(ex);
+            exceptions.add(new BloodseekerException(getClass(), ex));
             path = null;
         }
         if (path == null)
@@ -62,15 +64,14 @@ public class RemoteUpdateRunnable implements IRemoteUpdateRunnable {
         return cacheDir;
     }
 
-    public List<Exception> getExceptions() {
+    public BloodseekerExceptions getExceptions() {
         return exceptions;
     }
 
     @Override
     public void run() {
-
         if (uri == null) {
-            System.out.println("Thread #" + Thread.currentThread().getId() + ": update url not defined, skip this step.");
+            System.out.println("Thread #" + Thread.currentThread().getId() + ": update url is not defined, skip this step.");
             return;
         }
 
@@ -90,7 +91,7 @@ public class RemoteUpdateRunnable implements IRemoteUpdateRunnable {
             }
         }
         catch (Exception ex) {
-            exceptions.add(ex);
+            exceptions.add(new BloodseekerException(getClass(), ex));
         }
 
         long endTime = System.currentTimeMillis();
@@ -128,7 +129,7 @@ public class RemoteUpdateRunnable implements IRemoteUpdateRunnable {
             return checkCacheAndLoadFile(uri, secretKey, cacheDir, trails);
         }
         catch (Exception ex) {
-            exceptions.add(ex);
+            exceptions.add(this, ex);
             return false;
         }
     }

@@ -2,6 +2,7 @@ package com.am1goo.bloodseeker.android.trails;
 
 import android.app.Activity;
 
+import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.android.AndroidAppContext;
 import com.am1goo.bloodseeker.IResult;
 import com.am1goo.bloodseeker.utilities.StringUtilities;
@@ -57,7 +58,7 @@ public class PathInApkTrail extends BaseAndroidTrail implements IRemoteUpdateTra
     }
 
     @Override
-    public void seek(List<IResult> result, List<Exception> exceptions) {
+    public void seek(List<IResult> result, BloodseekerExceptions exceptions) {
         if (pathsInApk == null)
             return;
 

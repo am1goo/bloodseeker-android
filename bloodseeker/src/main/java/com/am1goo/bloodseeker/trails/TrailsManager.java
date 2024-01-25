@@ -1,5 +1,6 @@
 package com.am1goo.bloodseeker.trails;
 
+import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.TrailRunnable;
 import com.am1goo.bloodseeker.ITrail;
 
@@ -11,12 +12,12 @@ public class TrailsManager {
 
     private final ExecutorService asyncExecutor;
     private final List<ITrail> trails;
-    protected final List<Exception> exceptions;
+    protected final BloodseekerExceptions exceptions;
 
     public TrailsManager(ExecutorService asyncExecutor) {
         this.asyncExecutor = asyncExecutor;
         this.trails = new ArrayList<>();
-        this.exceptions = new ArrayList<>();
+        this.exceptions = new BloodseekerExceptions();
     }
 
     public boolean addTrail(ITrail trail) {

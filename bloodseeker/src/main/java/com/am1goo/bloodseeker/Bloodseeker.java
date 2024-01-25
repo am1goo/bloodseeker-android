@@ -1,7 +1,10 @@
 package com.am1goo.bloodseeker;
 
 import com.am1goo.bloodseeker.trails.TrailsManager;
+import com.am1goo.bloodseeker.update.ILocalUpdateRunnable;
 import com.am1goo.bloodseeker.update.IRemoteUpdateRunnable;
+import com.am1goo.bloodseeker.update.LocalUpdateConfig;
+import com.am1goo.bloodseeker.update.LocalUpdateManager;
 import com.am1goo.bloodseeker.update.RemoteUpdateConfig;
 import com.am1goo.bloodseeker.update.RemoteUpdateManager;
 
@@ -16,8 +19,9 @@ public class Bloodseeker {
 
     private final ExecutorService asyncExecutor;
     private final TrailsManager trailsManager;
+    private final LocalUpdateManager localUpdateManager;
     private final RemoteUpdateManager remoteUpdateManager;
-    private final List<Exception> exceptions;
+    private final BloodseekerExceptions exceptions;
     private boolean isUpdating;
     private boolean isSeeking;
     private boolean isShutdown;
@@ -25,8 +29,9 @@ public class Bloodseeker {
     public Bloodseeker() {
         this.asyncExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         this.trailsManager = createTrailsManager(asyncExecutor);
+        this.localUpdateManager = createLocalUpdateManager(trailsManager);
         this.remoteUpdateManager = createRemoteUpdateManager(trailsManager);
-        this.exceptions= new ArrayList<>();
+        this.exceptions= new BloodseekerExceptions();
         this.isUpdating = false;
         this.isSeeking = false;
         this.isShutdown = false;
@@ -34,6 +39,10 @@ public class Bloodseeker {
 
     protected TrailsManager createTrailsManager(ExecutorService asyncExecutor) {
         return new TrailsManager(asyncExecutor);
+    }
+
+    protected LocalUpdateManager createLocalUpdateManager(TrailsManager trailsManager) {
+        return new LocalUpdateManager(trailsManager);
     }
 
     protected RemoteUpdateManager createRemoteUpdateManager(TrailsManager trailsManager) {
@@ -44,23 +53,25 @@ public class Bloodseeker {
     	return trailsManager.addTrail(trail);
     }
 
+    public boolean setLocalUpdateConfig(LocalUpdateConfig config) {
+        try {
+            localUpdateManager.setConfig(config);
+            return true;
+        }
+        catch (IOException ex) {
+            exceptions.add(this, ex);
+            return false;
+        }
+    }
+
     public boolean setRemoteUpdateConfig(RemoteUpdateConfig config) {
         try {
             remoteUpdateManager.setConfig(config);
             return true;
         }
         catch (IOException ex) {
-            exceptions.add(ex);
+            exceptions.add(this, ex);
             return false;
-        }
-    }
-
-    public byte[] bake() {
-        try {
-            return remoteUpdateManager.exportToBytes();
-        }
-        catch (Exception ex) {
-            return null;
         }
     }
 
@@ -81,14 +92,19 @@ public class Bloodseeker {
         }
 
         final List<IResult> results = new ArrayList<>();
-        final List<Exception> exceptions = new ArrayList<>();
-        exceptions.addAll(this.exceptions);
+        final BloodseekerExceptions exceptions = new BloodseekerExceptions();
+        exceptions.add(this.exceptions);
 
         isUpdating = true;
         asyncExecutor.execute(() -> {
-            IRemoteUpdateRunnable updateRunnable = remoteUpdateManager.getRunnable();
-            updateRunnable.run();
-            exceptions.addAll(updateRunnable.getExceptions());
+            ILocalUpdateRunnable localUpdateRunnable = localUpdateManager.getRunnable();
+            localUpdateRunnable.run();
+            exceptions.add(localUpdateRunnable.getExceptions());
+
+            IRemoteUpdateRunnable remoteUpdateRunnable = remoteUpdateManager.getRunnable();
+            remoteUpdateRunnable.run();
+            exceptions.add(remoteUpdateRunnable.getExceptions());
+
             isUpdating = false;
 
             isSeeking = true;
@@ -107,13 +123,13 @@ public class Bloodseeker {
 
                     synchronized (lock) {
                         results.addAll(runnable.getResults());
-                        exceptions.addAll(runnable.getExceptions());
+                        exceptions.add(runnable.getExceptions());
 
                         int completedCount = completedCounter.incrementAndGet();
                         if (completedCount < trailsCount)
                             return;
 
-                        Report report = new Report(results, exceptions);
+                        Report report = new Report(results, exceptions.getExceptions());
                         try {
                             asyncReport.setResult(report);
                         } catch (Exception ex) {

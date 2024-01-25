@@ -7,6 +7,10 @@ import java.io.OutputStream;
 
 public class IOUtilities {
 
+    public static String getTempDir() {
+        return System.getProperty("java.io.tmpdir");
+    }
+
     public static void copy(InputStream inputStream, OutputStream outputStream) throws IOException {
         byte[] buffer = new byte[1024];
         int len;

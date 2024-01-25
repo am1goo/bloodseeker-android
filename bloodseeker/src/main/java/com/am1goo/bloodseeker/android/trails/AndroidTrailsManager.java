@@ -60,7 +60,7 @@ public class AndroidTrailsManager extends TrailsManager {
                 baseApk.close();
             }
             catch (IOException ex) {
-                exceptions.add(ex);
+                exceptions.add(this, ex);
             }
         }
         super.completeTasks();
@@ -71,7 +71,7 @@ public class AndroidTrailsManager extends TrailsManager {
             return AndroidUtilities.getUnityPlayerActivity();
         }
         catch (Exception ex) {
-            exceptions.add(ex);
+            exceptions.add(this, ex);
             return null;
         }
     }

@@ -2,6 +2,7 @@ package com.am1goo.bloodseeker.android.trails;
 
 import android.app.Activity;
 
+import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.android.AndroidAppContext;
 import com.am1goo.bloodseeker.IResult;
 import com.am1goo.bloodseeker.utilities.IOUtilities;
@@ -30,7 +31,7 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
     private static final String androidManifestNamespace = "http://schemas.android.com/apk/res/android";
 
     private final Looker[] lookers;
-    private final List<Exception> exceptions;
+    private final BloodseekerExceptions exceptions;
 
     public AndroidManifestXmlTrail(String json) {
         this(new String[] { json } );
@@ -38,7 +39,7 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
 
     public AndroidManifestXmlTrail(String[] jsons) {
         this.lookers = new Looker[jsons.length];
-        this.exceptions = new ArrayList<Exception>();
+        this.exceptions = new BloodseekerExceptions();
 
         for (int i = 0; i < jsons.length; ++i) {
             String json = jsons[i];
@@ -60,14 +61,14 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
                 this.lookers[i] = looker;
             }
             catch (Exception ex){
-                exceptions.add(ex);
+                exceptions.add(this, ex);
             }
         }
     }
 
     @Override
-    public void seek(List<IResult> result, List<Exception> exceptions) {
-        exceptions.addAll(this.exceptions);
+    public void seek(List<IResult> result, BloodseekerExceptions exceptions) {
+        exceptions.add(this.exceptions);
 
         AndroidAppContext context = getContext();
         if (context == null)
@@ -83,7 +84,7 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
 
         ZipEntry zipEntry = jarFile.getEntry(androidManifestFilename);
         if (zipEntry == null) {
-            exceptions.add(new FileNotFoundException(androidManifestFilename));
+            exceptions.add(this, new FileNotFoundException(androidManifestFilename));
             return;
         }
 
@@ -132,7 +133,7 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
             }
         }
         catch (IOException ex) {
-            exceptions.add(ex);
+            exceptions.add(this, ex);
         }
         finally {
             if (inputStream != null) {
@@ -140,7 +141,7 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
                     inputStream.close();
                 }
                 catch (IOException ex) {
-                    exceptions.add(ex);
+                    exceptions.add(this, ex);
                 }
             }
         }

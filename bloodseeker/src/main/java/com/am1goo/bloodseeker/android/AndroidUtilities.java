@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 
+import com.am1goo.bloodseeker.BloodseekerException;
+import com.am1goo.bloodseeker.BloodseekerExceptions;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +31,7 @@ public class AndroidUtilities {
         }
     }
 
-    public static JarFile getBaseApk(Activity activity, List<Exception> exceptions) {
+    public static JarFile getBaseApk(Activity activity, BloodseekerExceptions exceptions) {
         if (activity == null)
             return null;
 
@@ -37,7 +40,7 @@ public class AndroidUtilities {
         try {
             return new JarFile(appInfo.sourceDir);
         } catch (Exception ex) {
-            exceptions.add(ex);
+            exceptions.add(AndroidUtilities.class, ex);
             return null;
         }
     }

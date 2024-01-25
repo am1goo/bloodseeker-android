@@ -1,5 +1,7 @@
 package com.am1goo.bloodseeker.update;
 
+import com.am1goo.bloodseeker.utilities.HashUtilities;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -8,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.InvalidParameterException;
 import java.security.Key;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -145,7 +148,8 @@ public class RemoteUpdateFile {
     private byte[] aesDecrypt(byte[] bytes)
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
-        return aesDecrypt(bytes, secretKey);
+        byte[] secretHash = generateHash(secretKey);
+        return aesDecrypt(bytes, secretHash);
     }
 
     private static byte[] aesDecrypt(byte[] encryptedData, byte[] secretKey)
@@ -160,7 +164,8 @@ public class RemoteUpdateFile {
     private byte[] aesEncrypt(byte[] bytes)
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
-        return aesEncrypt(bytes, secretKey);
+        byte[] secretHash = generateHash(secretKey);
+        return aesEncrypt(bytes, secretHash);
     }
 
     private static byte[] aesEncrypt(byte[] Data, byte[] secretKey)
@@ -172,10 +177,15 @@ public class RemoteUpdateFile {
         return c.doFinal(Data);
     }
 
-    private static Key generateKey(byte[] secretKey) throws IllegalArgumentException {
-        if (secretKey == null)
-            throw new IllegalArgumentException("secretKey is undefined");
+    private static byte[] generateHash(byte[] secretKey) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        return digest.digest(secretKey);
+    }
 
-        return new SecretKeySpec(secretKey, AES);
+    private static Key generateKey(byte[] key) throws IllegalArgumentException {
+        if (key == null)
+            throw new IllegalArgumentException("key is undefined");
+
+        return new SecretKeySpec(key, AES);
     }
 }

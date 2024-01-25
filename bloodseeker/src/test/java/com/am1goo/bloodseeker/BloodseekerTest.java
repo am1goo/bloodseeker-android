@@ -3,10 +3,13 @@ package com.am1goo.bloodseeker;
 import com.am1goo.bloodseeker.trails.DelayTrail;
 import com.am1goo.bloodseeker.trails.ClassNameTrail;
 import com.am1goo.bloodseeker.trails.LibraryTrail;
+import com.am1goo.bloodseeker.update.LocalUpdateConfig;
 import com.am1goo.bloodseeker.update.RemoteUpdateConfig;
 import com.am1goo.bloodseeker.update.RemoteUpdateFile;
+import com.am1goo.bloodseeker.utilities.StringUtilities;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +18,10 @@ import org.junit.Test;
 
 public class BloodseekerTest {
 
-    private static final String SECRET_KEY = "0123456789ABCDEF";
+    private static final String SECRET_KEY = StringUtilities.getRandomString(44);
 
     @Test
-    public void testSeekAsync() throws InterruptedException {
+    public void testSeekAsync() throws InterruptedException, IOException {
         Bloodseeker sdk = new Bloodseeker();
         setupSdk(sdk, SECRET_KEY);
 
@@ -37,21 +40,6 @@ public class BloodseekerTest {
     }
 
     @Test
-    public void testBake() throws Exception {
-        Bloodseeker sdk = new Bloodseeker();
-        setupSdk(sdk, SECRET_KEY);
-
-        byte[] bytes = sdk.bake();
-        Assert.assertNotNull(bytes);
-
-        byte[] secretKey = SECRET_KEY.getBytes("utf-8");
-        RemoteUpdateFile file = new RemoteUpdateFile(secretKey);
-        try (InputStream inputStream = new ByteArrayInputStream(bytes)) {
-            file.load(inputStream);
-        }
-    }
-
-    @Test
     public void testClassNameTrail() {
         ITrail trail = new ClassNameTrail("com.am1goo.bloodseeker.ITrail");
         boolean found = seek(trail);
@@ -65,12 +53,18 @@ public class BloodseekerTest {
         Assert.assertFalse(found);
     }
 
-    public static void setupSdk(Bloodseeker sdk, String secretKey) {
-        RemoteUpdateConfig config = new RemoteUpdateConfig();
-        config.setUrl("https://raw.githubusercontent.com/am1goo/bloodseeker-unity/main/package.json");
-        config.setSecretKey(secretKey);
-        config.setCacheTTL(60);
-        sdk.setRemoteUpdateConfig(config);
+    public static void setupSdk(Bloodseeker sdk, String secretKey) throws IOException {
+        LocalUpdateConfig localConfig = new LocalUpdateConfig();
+        localConfig.setFile("examples/remote-update-project-hierarchy/generated.bmx");
+        localConfig.setSecretKey("0123456789ABCDEF");
+
+        RemoteUpdateConfig remoteConfig = new RemoteUpdateConfig();
+        remoteConfig.setUrl("https://raw.githubusercontent.com/am1goo/bloodseeker-unity/main/package.json");
+        remoteConfig.setSecretKey(secretKey);
+        remoteConfig.setCacheTTL(60);
+
+        sdk.setLocalUpdateConfig(localConfig);
+        sdk.setRemoteUpdateConfig(remoteConfig);
         sdk.addTrail(new ClassNameTrail("java.util.List"));
         sdk.addTrail(new ClassNameTrail("java.util.ArrayList"));
         sdk.addTrail(new ClassNameTrail("com.some.class.Name"));
@@ -79,7 +73,7 @@ public class BloodseekerTest {
 
     private static boolean seek(ITrail trail) {
         List<IResult> result = new ArrayList<IResult>();
-        List<Exception> exceptions = new ArrayList<Exception>();
+        BloodseekerExceptions exceptions = new BloodseekerExceptions();
         trail.seek(result, exceptions);
         return result.size() > 0;
     }

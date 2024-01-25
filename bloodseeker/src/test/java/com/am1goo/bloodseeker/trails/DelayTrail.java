@@ -1,5 +1,6 @@
 package com.am1goo.bloodseeker.trails;
 
+import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.IResult;
 import com.am1goo.bloodseeker.ITrail;
 import com.am1goo.bloodseeker.update.IRemoteUpdateTrail;
@@ -47,12 +48,12 @@ public class DelayTrail implements IRemoteUpdateTrail, ITrail {
     }
 
     @Override
-    public void seek(List<IResult> result, List<Exception> exceptions) {
+    public void seek(List<IResult> result, BloodseekerExceptions exceptions) {
         try {
             Thread.sleep(milliseconds);
         }
         catch (InterruptedException ex) {
-            exceptions.add(ex);
+            exceptions.add(this, ex);
         }
     }
 }

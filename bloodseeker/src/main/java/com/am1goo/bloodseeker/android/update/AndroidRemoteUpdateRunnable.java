@@ -32,8 +32,8 @@ public class AndroidRemoteUpdateRunnable extends RemoteUpdateRunnable {
     @Override
     public void run() {
         if (activity == null) {
-            System.out.println("Thread #" + Thread.currentThread().getId() + ": update is disabled, activity not found");
-            exceptions.add(new Exception("remote update unavailable, activity not found"));
+            System.out.println("Thread #" + Thread.currentThread().getId() + ": remote update is disabled, activity not found");
+            exceptions.add(this, new Exception("remote update unavailable, activity not found"));
             return;
         }
 
@@ -41,8 +41,8 @@ public class AndroidRemoteUpdateRunnable extends RemoteUpdateRunnable {
         String permission = Manifest.permission.INTERNET;
         int permissionResult = ctx.checkCallingOrSelfPermission(permission);
         if (permissionResult != PackageManager.PERMISSION_GRANTED) {
-            System.out.println("Thread #" + Thread.currentThread().getId() + ": update is disabled, app doesn't have permission " + permission);
-            exceptions.add(new Exception("remote update unavailable, app doesn't have permission " + permission));
+            System.out.println("Thread #" + Thread.currentThread().getId() + ": remote update is disabled, app doesn't have permission " + permission);
+            exceptions.add(this, new Exception("remote update unavailable, app doesn't have permission " + permission));
             return;
         }
 

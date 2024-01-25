@@ -1,7 +1,5 @@
 package com.am1goo.bloodseeker;
 
-import com.am1goo.bloodseeker.IResult;
-
 import java.util.List;
 
 public class Report {

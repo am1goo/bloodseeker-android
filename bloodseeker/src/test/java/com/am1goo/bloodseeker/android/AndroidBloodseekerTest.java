@@ -11,19 +11,21 @@ import com.am1goo.bloodseeker.trails.ClassNameTrail;
 import com.am1goo.bloodseeker.trails.DelayTrail;
 import com.am1goo.bloodseeker.update.RemoteUpdateConfig;
 import com.am1goo.bloodseeker.update.RemoteUpdateFile;
+import com.am1goo.bloodseeker.utilities.StringUtilities;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 public class AndroidBloodseekerTest {
 
-    private static final String SECRET_KEY = "0123456789ABCDEF";
+    private static final String SECRET_KEY = StringUtilities.getRandomString(85);
 
     @Test
-    public void testSeekAsync() throws InterruptedException {
+    public void testSeekAsync() throws InterruptedException, IOException {
         AndroidBloodseeker sdk = new AndroidBloodseeker();
         setupSdk(sdk, SECRET_KEY);
 
@@ -41,22 +43,7 @@ public class AndroidBloodseekerTest {
         Assert.assertTrue(report.isSuccess());
     }
 
-    @Test
-    public void testBake() throws Exception {
-        AndroidBloodseeker sdk = new AndroidBloodseeker();
-        setupSdk(sdk, SECRET_KEY);
-
-        byte[] bytes = sdk.bake();
-        Assert.assertNotNull(bytes);
-
-        byte[] secretKey = SECRET_KEY.getBytes("utf-8");
-        RemoteUpdateFile file = new RemoteUpdateFile(secretKey);
-        try (InputStream inputStream = new ByteArrayInputStream(bytes)) {
-            file.load(inputStream);
-        }
-    }
-
-    private void setupSdk(AndroidBloodseeker sdk, String secretKey) {
+    private void setupSdk(AndroidBloodseeker sdk, String secretKey) throws IOException {
         BloodseekerTest.setupSdk(sdk, secretKey);
         sdk.addTrail(new PackageNameTrail("java.util"));
         sdk.addTrail(new PathInApkTrail("META-INF/MANIFEST.MF"));
