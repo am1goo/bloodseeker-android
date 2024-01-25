@@ -24,6 +24,6 @@ public class AndroidRemoteUpdateManager extends RemoteUpdateManager {
 
     @Override
     public IRemoteUpdateRunnable getRunnable() {
-        return new AndroidRemoteUpdateRunnable(activity, uri, secretKey, cacheTTL, trailsManager);
+        return new AndroidRemoteUpdateRunnable(activity, ssl, uri, secretKey, cacheTTL, trailsManager);
     }
 }

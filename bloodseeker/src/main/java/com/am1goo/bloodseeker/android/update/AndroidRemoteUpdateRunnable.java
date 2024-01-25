@@ -5,18 +5,22 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
+import androidx.annotation.Nullable;
+
 import com.am1goo.bloodseeker.update.RemoteUpdateRunnable;
 import com.am1goo.bloodseeker.trails.TrailsManager;
 
 import java.io.File;
 import java.net.URI;
 
+import javax.net.ssl.SSLSocketFactory;
+
 public class AndroidRemoteUpdateRunnable extends RemoteUpdateRunnable {
 
     private final Activity activity;
 
-    public AndroidRemoteUpdateRunnable(Activity activity, URI uri, byte[] secretKey, long cacheTTL, TrailsManager trailsManager) {
-        super(uri, secretKey, cacheTTL, trailsManager);
+    public AndroidRemoteUpdateRunnable(Activity activity, @Nullable SSLSocketFactory ssl, URI uri, byte[] secretKey, long cacheTTL, TrailsManager trailsManager) {
+        super(uri, ssl, secretKey, cacheTTL, trailsManager);
         this.activity = activity;
     }
 

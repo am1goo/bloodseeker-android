@@ -1,14 +1,19 @@
 package com.am1goo.bloodseeker.update;
 
+import androidx.annotation.Nullable;
+
 import com.am1goo.bloodseeker.BloodseekerException;
 import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.ITrail;
 import com.am1goo.bloodseeker.trails.TrailsManager;
 import com.am1goo.bloodseeker.utilities.DateUtilities;
 import com.am1goo.bloodseeker.utilities.IOUtilities;
+import com.am1goo.bloodseeker.utilities.SecureUtilities;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,8 +24,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -28,17 +38,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+
 public class RemoteUpdateRunnable implements IRemoteUpdateRunnable {
 
     final URI uri;
+    final SSLSocketFactory ssl;
     final byte[] secretKey;
     final long cacheTTL;
     final private TrailsManager trailsManager;
     final protected BloodseekerExceptions exceptions;
     final private File cacheDir;
 
-    public RemoteUpdateRunnable(URI uri, byte[] secretKey, long cacheTTL, TrailsManager trailsManager) {
+    public RemoteUpdateRunnable(URI uri, @Nullable SSLSocketFactory ssl, byte[] secretKey, long cacheTTL, TrailsManager trailsManager) {
         this.uri = uri;
+        this.ssl = ssl;
         this.secretKey = secretKey;
         this.cacheTTL = cacheTTL;
         this.trailsManager = trailsManager;
@@ -101,13 +119,19 @@ public class RemoteUpdateRunnable implements IRemoteUpdateRunnable {
 
     private void downloadAndLoadFile(URI uri, byte[] secretKey, File cacheDir, List<ITrail> trails) throws Exception {
         final URL url = uri.toURL();
-        final HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
-        try (InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream())) {
+        final HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
+        if (httpConnection instanceof HttpsURLConnection) {
+            if (ssl != null) {
+                HttpsURLConnection httpsConnection = (HttpsURLConnection)httpConnection;
+                httpsConnection.setSSLSocketFactory(ssl);
+            }
+        }
+        try (InputStream inputStream = new BufferedInputStream(httpConnection.getInputStream())) {
             loadFromFile(inputStream, secretKey, trails);
             saveToCache(uri, cacheDir, inputStream);
         }
         finally {
-            urlConnection.disconnect();
+            httpConnection.disconnect();
         }
     }
 

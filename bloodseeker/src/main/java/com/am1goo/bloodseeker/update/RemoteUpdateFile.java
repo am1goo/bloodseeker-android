@@ -1,7 +1,5 @@
 package com.am1goo.bloodseeker.update;
 
-import com.am1goo.bloodseeker.utilities.HashUtilities;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
