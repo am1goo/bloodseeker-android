@@ -33,36 +33,17 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
     private final Looker[] lookers;
     private final BloodseekerExceptions exceptions;
 
-    public AndroidManifestXmlTrail(String json) {
-        this(new String[] { json } );
+    public AndroidManifestXmlTrail(Looker looker) {
+        this(new Looker[] { looker } );
     }
 
-    public AndroidManifestXmlTrail(String[] jsons) {
-        this.lookers = new Looker[jsons.length];
+    public AndroidManifestXmlTrail(Looker[] lookers) {
+        this.lookers = lookers;
         this.exceptions = new BloodseekerExceptions();
 
-        for (int i = 0; i < jsons.length; ++i) {
-            String json = jsons[i];
-            try {
-                JSONObject deserializer = new JSONObject(json);
-                Looker looker = new Looker();
-
-                JSONArray nodesArray = deserializer.getJSONArray("nodes");
-                int nodesLength = nodesArray.length();
-                String[] nodes = new String[nodesLength];
-                for (int ii = 0; ii < nodesLength; ++ii) {
-                    nodes[ii] = nodesArray.getString(ii);
-                }
-                looker.nodes = nodes;
-                looker.attribute = deserializer.getString("attribute");
-                looker.value = deserializer.getString("value");
-                looker.fixIfNeed();
-
-                this.lookers[i] = looker;
-            }
-            catch (Exception ex){
-                exceptions.add(this, ex);
-            }
+        for (int i = 0; i < lookers.length; ++i) {
+            Looker looker = lookers[i];
+            looker.fixIfNeed();
         }
     }
 
@@ -195,19 +176,43 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
         return null;
     }
 
-    public class Looker {
+    public static class Looker {
 
         public static final String rootManifestNode = "manifest";
 
-        public String[] nodes;
-        public String attribute;
-        public String value;
+        private String[] nodes;
+        private String attribute;
+        private String value;
+
+        public String[] getNodes() {
+            return nodes;
+        }
+
+        public void setNodes(String[] nodes) {
+            this.nodes = nodes;
+        }
+
+        public String getAttribute() {
+            return attribute;
+        }
+
+        public void setAttribute(String attribute) {
+            this.attribute = attribute;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
 
         public void fixIfNeed() {
             nodes = fixIfNeed(nodes);
         }
 
-        private String[] fixIfNeed(String[] nodes) {
+        private static String[] fixIfNeed(String[] nodes) {
             if (nodes.length > 0 && Objects.equals(nodes[0], rootManifestNode))
                 return nodes;
 
