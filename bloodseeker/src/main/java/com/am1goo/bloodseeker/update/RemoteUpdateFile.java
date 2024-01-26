@@ -1,5 +1,7 @@
 package com.am1goo.bloodseeker.update;
 
+import androidx.annotation.Nullable;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -38,12 +40,18 @@ public class RemoteUpdateFile {
         return CYPHER_AES;
     }
 
+    private short version;
     private final byte[] secretKey;
     private final List<IRemoteUpdateTrail> trails;
 
     public RemoteUpdateFile(byte[] secretKey) {
+        this.version = VERSION;
         this.secretKey = secretKey;
         this.trails = new ArrayList<>();
+    }
+
+    public short getVersion() {
+        return version;
     }
 
     public List<IRemoteUpdateTrail> getTrails() {
@@ -62,7 +70,7 @@ public class RemoteUpdateFile {
 
     private void load(RemoteUpdateReader reader) throws Exception {
         reader.readHeader();
-        int version = reader.readVersion();
+        version = reader.readVersion();
         byte cypher = reader.readByte();
 
         int payloadLength = reader.readInt();
@@ -75,10 +83,20 @@ public class RemoteUpdateFile {
                 int trailsCount = payloadReader.readInt();
                 for (int i = 0; i < trailsCount; ++i) {
                     String className = payloadReader.readString();
-                    Class<?> classObj = Class.forName(className);
-                    IRemoteUpdateTrail trail = (IRemoteUpdateTrail)classObj.newInstance();
-                    trail.load(payloadReader);
-                    trails.add(trail);
+                    byte[] trailBytes = payloadReader.readBytes();
+
+                    Class<?> classObj = getClassSafe(className);
+                    if (classObj == null) {
+                        System.err.println("load: class " + className + " not found, skipped");
+                        continue;
+                    }
+                    IRemoteUpdateTrail trail = (IRemoteUpdateTrail) classObj.newInstance();
+                    try (ByteArrayInputStream trailStream = new ByteArrayInputStream(trailBytes)) {
+                        try (RemoteUpdateReader trailReader = new RemoteUpdateReader(trailStream)) {
+                            trail.load(trailReader);
+                            trails.add(trail);
+                        }
+                    }
                 }
             }
         }
@@ -91,7 +109,7 @@ public class RemoteUpdateFile {
 
     private void save(RemoteUpdateWriter writer) throws Exception {
         writer.writeHeader();
-        writer.writeVersion();
+        writer.writeVersion(version);
         writer.writeByte(CYPHER_TYPE);
 
         byte[] payload;
@@ -102,7 +120,15 @@ public class RemoteUpdateFile {
                     IRemoteUpdateTrail trail = trails.get(i);
                     String className = trail.getClass().getName();
                     payloadWriter.writeString(className, CHARSET_NAME);
-                    trail.save(payloadWriter);
+
+                    try (ByteArrayOutputStream trailStream = new ByteArrayOutputStream()) {
+                        try (RemoteUpdateWriter trailWriter = new RemoteUpdateWriter(trailStream)) {
+                            trail.save(trailWriter);
+
+                            byte[] trailBytes = trailStream.toByteArray();
+                            payloadWriter.writeBytes(trailBytes);
+                        }
+                    }
                 }
                 payload = payloadStream.toByteArray();
             }
@@ -185,5 +211,15 @@ public class RemoteUpdateFile {
             throw new IllegalArgumentException("key is undefined");
 
         return new SecretKeySpec(key, AES);
+    }
+
+    @Nullable
+    private static Class<?> getClassSafe(String className) {
+        try {
+            return Class.forName(className);
+        }
+        catch (ClassNotFoundException ex) {
+            return null;
+        }
     }
 }

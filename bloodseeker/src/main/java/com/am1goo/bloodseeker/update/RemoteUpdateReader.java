@@ -33,7 +33,7 @@ public class RemoteUpdateReader extends DataInputStream {
             throw new IOException("wrong header");
     }
 
-    public int readVersion() throws IOException {
+    public short readVersion() throws IOException {
         return readShort();
     }
 

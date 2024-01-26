@@ -1,5 +1,6 @@
 package com.am1goo.bloodseeker.update;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,8 +22,8 @@ public class RemoteUpdateWriter extends DataOutputStream {
         write(RemoteUpdateFile.HEADER_BYTES);
     }
 
-    public void writeVersion() throws IOException {
-        writeShort(RemoteUpdateFile.VERSION);
+    public void writeVersion(short version) throws IOException {
+        writeShort(version);
     }
 
     public void writeString(String str, String charsetName) throws IOException {
