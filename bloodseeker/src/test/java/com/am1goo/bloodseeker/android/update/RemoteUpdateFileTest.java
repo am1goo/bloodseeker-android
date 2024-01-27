@@ -1,5 +1,6 @@
 package com.am1goo.bloodseeker.android.update;
 
+import com.am1goo.bloodseeker.android.trails.AndroidManifestXmlTrail;
 import com.am1goo.bloodseeker.trails.ClassNameTrail;
 import com.am1goo.bloodseeker.android.trails.PackageNameTrail;
 import com.am1goo.bloodseeker.android.trails.PathInApkTrail;
@@ -30,6 +31,11 @@ public class RemoteUpdateFileTest {
         trails.add(new PackageNameTrail("java.util"));
         trails.add(new PathInApkTrail("META-INF/MANIFEST.MF"));
         trails.add(new DelayTrail(1000));
+        trails.add(new AndroidManifestXmlTrail(new AndroidManifestXmlTrail.Looker(new String[]
+                { "application", "provider" },
+                "android:name",
+                "com.facebook.internal.FacebookInitProvider",
+                AndroidManifestXmlTrail.Looker.Condition.Eq)));
         srcFile.setTrails(trails);
 
         byte[] bytes;

@@ -1,8 +1,10 @@
 package com.am1goo.bloodseeker.update;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,6 +64,27 @@ public class RemoteUpdateReader extends DataInputStream {
         String[] array = new String[arrayLength];
         for (int i = 0; i < arrayLength; ++i) {
             array[i] = readString();
+        }
+        return array;
+    }
+
+    public <T> T[] readArray(Class<T> clazz) throws Exception {
+        int arrayLength = readInt();
+        T[] array = (T[])Array.newInstance(clazz, arrayLength);
+        for (int i = 0; i < arrayLength; ++i) {
+            byte[] bytes = readBytes();
+            Object classObj = clazz.newInstance();
+            if (bytes.length > 0) {
+                if (classObj instanceof RemoteUpdateSerializable) {
+                    RemoteUpdateSerializable serializable = (RemoteUpdateSerializable) classObj;
+                    try (InputStream classStream = new ByteArrayInputStream(bytes)) {
+                        try (RemoteUpdateReader classReader = new RemoteUpdateReader(classStream)) {
+                            serializable.load(classReader);
+                        }
+                    }
+                }
+            }
+            array[i] = (T)classObj;
         }
         return array;
     }

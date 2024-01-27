@@ -21,7 +21,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
-public class RemoteUpdateFile {
+public class RemoteUpdateFile implements RemoteUpdateSerializable {
 
     public static final String EXTENSION = ".bmx";
     public static final byte[] HEADER_BYTES = new byte[] { 66, 77, 88, 63 };
@@ -68,7 +68,7 @@ public class RemoteUpdateFile {
         load(reader);
     }
 
-    private void load(RemoteUpdateReader reader) throws Exception {
+    public void load(RemoteUpdateReader reader) throws Exception {
         reader.readHeader();
         version = reader.readVersion();
         byte cypher = reader.readByte();
@@ -107,7 +107,7 @@ public class RemoteUpdateFile {
         save(writer);
     }
 
-    private void save(RemoteUpdateWriter writer) throws Exception {
+    public void save(RemoteUpdateWriter writer) throws Exception {
         writer.writeHeader();
         writer.writeVersion(version);
         writer.writeByte(CYPHER_TYPE);
