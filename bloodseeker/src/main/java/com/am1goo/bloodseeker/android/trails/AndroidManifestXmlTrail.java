@@ -5,6 +5,11 @@ import android.app.Activity;
 import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.android.AndroidAppContext;
 import com.am1goo.bloodseeker.IResult;
+import com.am1goo.bloodseeker.update.IRemoteUpdateTrail;
+import com.am1goo.bloodseeker.update.RemoteUpdateFile;
+import com.am1goo.bloodseeker.update.RemoteUpdateReader;
+import com.am1goo.bloodseeker.update.RemoteUpdateSerializable;
+import com.am1goo.bloodseeker.update.RemoteUpdateWriter;
 import com.am1goo.bloodseeker.utilities.IOUtilities;
 
 import org.json.JSONArray;
@@ -25,13 +30,16 @@ import java.util.zip.ZipEntry;
 import pxb.android.axml.Axml;
 import pxb.android.axml.AxmlReader;
 
-public class AndroidManifestXmlTrail extends BaseAndroidTrail {
+public class AndroidManifestXmlTrail extends BaseAndroidTrail implements IRemoteUpdateTrail {
 
     private static final String androidManifestFilename = "AndroidManifest.xml";
     private static final String androidManifestNamespace = "http://schemas.android.com/apk/res/android";
 
-    private final Looker[] lookers;
-    private final BloodseekerExceptions exceptions;
+    private Looker[] lookers;
+    private BloodseekerExceptions exceptions;
+
+    public AndroidManifestXmlTrail() {
+    }
 
     public AndroidManifestXmlTrail(Looker looker) {
         this(new Looker[] { looker } );
@@ -45,6 +53,33 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
             Looker looker = lookers[i];
             looker.fixIfNeed();
         }
+    }
+
+    @Override
+    public void load(RemoteUpdateReader reader) throws Exception {
+        this.lookers = reader.readArray(Looker.class);
+    }
+
+    @Override
+    public void save(RemoteUpdateWriter writer) throws Exception {
+        writer.writeArray(lookers);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        AndroidManifestXmlTrail that = (AndroidManifestXmlTrail) o;
+        return Arrays.equals(lookers, that.lookers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(lookers);
     }
 
     @Override
@@ -85,9 +120,10 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
             }
 
             for (Looker looker : lookers) {
-                String[] paths = looker.nodes;
-                String attribute = looker.attribute;
-                String expectedValue = looker.value;
+                final String[] paths = looker.getNodes();
+                final String attribute = looker.getAttribute();
+                final String expectedValue = looker.getValue();
+                final Looker.Condition condition = looker.getCondition();
 
                 Axml.Node foundNode = findAxmlNode(axml.firsts, paths);
                 if (foundNode == null) {
@@ -104,10 +140,20 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
                 }
 
                 String actualValue = String.valueOf(attr.value);
-                if (!Objects.equals(actualValue, expectedValue)) {
-                    String pathsAsStr = String.join("/", paths);
-                    result.add(new InvalidValueResult(pathsAsStr, actualValue, expectedValue));
-                    continue;
+                boolean equals = Objects.equals(actualValue, expectedValue);
+                switch (condition) {
+                    case Eq:
+                        if (!equals) {
+                            String pathsAsStr = String.join("/", paths);
+                            result.add(new InvalidValueResult(pathsAsStr, condition.toString(), actualValue, expectedValue));
+                            continue;
+                        }
+                    case NotEq:
+                        if (equals) {
+                            String pathsAsStr = String.join("/", paths);
+                            result.add(new InvalidValueResult(pathsAsStr, condition.toString(), actualValue, expectedValue));
+                            continue;
+                        }
                 }
 
                 //do nothing, everything okay
@@ -176,13 +222,72 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
         return null;
     }
 
-    public static class Looker {
+    public static class Looker implements RemoteUpdateSerializable {
 
         public static final String rootManifestNode = "manifest";
 
+        private static final short VERSION = 1;
+        private short version;
         private String[] nodes;
         private String attribute;
         private String value;
+        private Condition condition;
+
+        public Looker() {
+            version = VERSION;
+        }
+
+        public Looker(String[] nodes, String attribute, String value, Condition condition) {
+            this();
+            this.nodes = nodes;
+            this.attribute = attribute;
+            this.value = value;
+            this.condition = condition;
+        }
+
+        @Override
+        public void load(RemoteUpdateReader reader) throws Exception {
+            version = reader.readVersion();
+            nodes = reader.readStringArray();
+            attribute = reader.readString();
+            value = reader.readString();
+            condition = Condition.valueOf(reader.readInt());
+        }
+
+        @Override
+        public void save(RemoteUpdateWriter writer) throws Exception {
+            writer.writeVersion(version);
+            writer.writeStringArray(nodes, RemoteUpdateFile.CHARSET_NAME);
+            writer.writeString(attribute, RemoteUpdateFile.CHARSET_NAME);
+            writer.writeString(value, RemoteUpdateFile.CHARSET_NAME);
+            writer.writeInt(condition.getValue());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+
+            if (o == null || getClass() != o.getClass())
+                return false;
+
+            Looker looker = (Looker) o;
+            return Arrays.equals(nodes, looker.nodes)
+                    && Objects.equals(attribute, looker.attribute)
+                    && Objects.equals(value, looker.value)
+                    && condition == looker.condition;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Objects.hash(attribute, value, condition);
+            result = 31 * result + Arrays.hashCode(nodes);
+            return result;
+        }
+
+        public short getVersion() {
+            return version;
+        }
 
         public String[] getNodes() {
             return nodes;
@@ -208,6 +313,14 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
             this.value = value;
         }
 
+        public Condition getCondition() {
+            return condition;
+        }
+
+        public void setCondition(Condition condition) {
+            this.condition = condition;
+        }
+
         public void fixIfNeed() {
             nodes = fixIfNeed(nodes);
         }
@@ -221,9 +334,48 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
             System.arraycopy(nodes, 0, array, 1, nodes.length);
             return array;
         }
+
+        public enum Condition {
+            Eq(0, "Equals"),
+            NotEq(1, "NotEquals");
+
+            private final int value;
+            private final String label;
+
+            Condition(int value, String label) {
+                this.value = value;
+                this.label = label;
+            }
+
+            public int getValue() {
+                return value;
+            }
+
+            public String getLabel() {
+                return label;
+            }
+
+            public static Condition valueOf(int value) {
+                for (Condition condition : values()) {
+                    if (condition.value == value) {
+                        return condition;
+                    }
+                }
+                return Condition.Eq;
+            }
+
+            public static Condition labelOf(String label) {
+                for (Condition condition : values()) {
+                    if (condition.label.equals(label)) {
+                        return condition;
+                    }
+                }
+                return Condition.Eq;
+            }
+        }
     }
 
-    public class NodeNotFoundResult implements IResult {
+    public static class NodeNotFoundResult implements IResult {
         private final String nodePath;
 
         public NodeNotFoundResult(String nodePath) {
@@ -236,7 +388,7 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
         }
     }
 
-    public class AttrNotFoundResult implements IResult {
+    public static class AttrNotFoundResult implements IResult {
         private final String nodePath;
         private final String attr;
 
@@ -251,20 +403,22 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail {
         }
     }
 
-    public class InvalidValueResult implements IResult {
+    public static class InvalidValueResult implements IResult {
         private final String nodePath;
+        private final String condition;
         private final String actualValue;
         private final String expectedValue;
 
-        public InvalidValueResult(String nodePath, String actualValue, String expectedValue) {
+        public InvalidValueResult(String nodePath, String condition, String actualValue, String expectedValue) {
             this.nodePath = nodePath;
+            this.condition = condition;
             this.actualValue = actualValue;
             this.expectedValue = expectedValue;
         }
 
         @Override
         public String toString() {
-            return "AndroidManifest.xml node " + nodePath + " has wrong value (actual '" + actualValue + "', expected '" + expectedValue + "')";
+            return "AndroidManifest.xml node " + nodePath + " has wrong " + condition + " value (actual '" + actualValue + "', expected '" + expectedValue + "')";
         }
     }
 }

@@ -5,6 +5,7 @@ import com.am1goo.bloodseeker.AsyncReport;
 import com.am1goo.bloodseeker.Bloodseeker;
 import com.am1goo.bloodseeker.BloodseekerTest;
 import com.am1goo.bloodseeker.Report;
+import com.am1goo.bloodseeker.android.trails.AndroidManifestXmlTrail;
 import com.am1goo.bloodseeker.android.trails.PackageNameTrail;
 import com.am1goo.bloodseeker.android.trails.PathInApkTrail;
 import com.am1goo.bloodseeker.trails.ClassNameTrail;
@@ -47,5 +48,10 @@ public class AndroidBloodseekerTest {
         BloodseekerTest.setupSdk(sdk, secretKey);
         sdk.addTrail(new PackageNameTrail("java.util"));
         sdk.addTrail(new PathInApkTrail("META-INF/MANIFEST.MF"));
+        sdk.addTrail(new AndroidManifestXmlTrail(new AndroidManifestXmlTrail.Looker(new String[]
+                { "application", "provider" },
+                "android:name",
+                "com.facebook.internal.FacebookInitProvider",
+                AndroidManifestXmlTrail.Looker.Condition.Eq)));
     }
 }
