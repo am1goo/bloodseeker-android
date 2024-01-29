@@ -46,24 +46,27 @@ public class RemoteUpdateWriter extends DataOutputStream {
         }
     }
 
+    public void writeObject(Object obj) throws Exception {
+        byte[] classBytes;
+        if (obj instanceof RemoteUpdateSerializable) {
+            RemoteUpdateSerializable serializable = (RemoteUpdateSerializable)obj;
+            try (ByteArrayOutputStream classStream = new ByteArrayOutputStream()) {
+                try (RemoteUpdateWriter classWriter = new RemoteUpdateWriter(classStream)) {
+                    serializable.save(classWriter);
+                    classBytes = classStream.toByteArray();
+                }
+            }
+        }
+        else {
+            classBytes = new byte[0];
+        }
+        writeBytes(classBytes);
+    }
+
     public void writeArray(Object[] array) throws Exception {
         writeInt(array.length);
         for (int i = 0; i < array.length; ++i) {
-            Object classObj = array[i];
-            byte[] classBytes;
-            if (classObj instanceof RemoteUpdateSerializable) {
-                RemoteUpdateSerializable serializable = (RemoteUpdateSerializable)classObj;
-                try (ByteArrayOutputStream classStream = new ByteArrayOutputStream()) {
-                    try (RemoteUpdateWriter classWriter = new RemoteUpdateWriter(classStream)) {
-                        serializable.save(classWriter);
-                        classBytes = classStream.toByteArray();
-                    }
-                }
-            }
-            else {
-                classBytes = new byte[0];
-            }
-            writeBytes(classBytes);
+            writeObject(array[i]);
         }
     }
 }
