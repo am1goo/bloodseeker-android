@@ -146,12 +146,14 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail implements IRemote
                             result.add(new InvalidValueResult(pathsAsStr, condition.toString(), actualValue, expectedValue));
                             continue;
                         }
+                        break;
                     case NotEq:
                         if (equals) {
                             String pathsAsStr = String.join("/", paths);
                             result.add(new InvalidValueResult(pathsAsStr, condition.toString(), actualValue, expectedValue));
                             continue;
                         }
+                        break;
                 }
 
                 //do nothing, everything okay
