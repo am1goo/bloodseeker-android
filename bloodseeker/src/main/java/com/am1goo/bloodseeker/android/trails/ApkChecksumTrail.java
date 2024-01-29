@@ -16,23 +16,28 @@ import java.io.File;
 import java.util.List;
 
 public class ApkChecksumTrail extends BaseAndroidTrail implements IRemoteUpdateTrail {
-
+    private static final short VERSION = 1;
+    private short version;
     private long checksum;
 
-    public ApkChecksumTrail() {
+    public ApkChecksumTrail(long checksum) {
+        this();
+        this.checksum = checksum;
     }
 
-    public ApkChecksumTrail(long checksum) {
-        this.checksum = checksum;
+    public ApkChecksumTrail() {
+        version = VERSION;
     }
 
     @Override
     public void load(RemoteUpdateReader reader) throws Exception {
+        this.version = reader.readVersion();
         this.checksum = reader.readLong();
     }
 
     @Override
     public void save(RemoteUpdateWriter writer) throws Exception {
+        writer.writeVersion(version);
         writer.writeLong(checksum);
     }
 
