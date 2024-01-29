@@ -1,5 +1,7 @@
 package com.am1goo.bloodseeker.trails;
 
+import androidx.annotation.NonNull;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -88,7 +90,8 @@ public class LibraryTrail implements IRemoteUpdateTrail, ITrail {
 			this.libraryName = libraryName;
 		}
 		
-		@Override
+		@NonNull
+        @Override
 		public String toString() {
 			return "Library '" + libraryName + "' found";
 		}

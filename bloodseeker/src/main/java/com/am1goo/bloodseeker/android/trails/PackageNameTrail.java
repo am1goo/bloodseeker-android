@@ -2,6 +2,8 @@ package com.am1goo.bloodseeker.android.trails;
 
 import android.app.Activity;
 
+import androidx.annotation.NonNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,7 +95,7 @@ public class PackageNameTrail extends BaseAndroidTrail implements IRemoteUpdateT
 		if (activity == null)
 			return new HashSet<String>();
 
-		JarFile jarFile = context.getBaseApk();
+		JarFile jarFile = context.getBaseApkJar();
 		if (jarFile == null)
 			return new HashSet<String>();
 
@@ -186,7 +188,8 @@ public class PackageNameTrail extends BaseAndroidTrail implements IRemoteUpdateT
 			this.packageName = packageName;
 		}
 		
-		@Override
+		@NonNull
+        @Override
 		public String toString() {
 			return "Package '" + packageName + "' found";
 		}

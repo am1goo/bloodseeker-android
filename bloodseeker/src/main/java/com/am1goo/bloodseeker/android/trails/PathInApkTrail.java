@@ -2,6 +2,8 @@ package com.am1goo.bloodseeker.android.trails;
 
 import android.app.Activity;
 
+import androidx.annotation.NonNull;
+
 import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.android.AndroidAppContext;
 import com.am1goo.bloodseeker.IResult;
@@ -70,7 +72,7 @@ public class PathInApkTrail extends BaseAndroidTrail implements IRemoteUpdateTra
         if (activity == null)
             return;
 
-        JarFile jarFile = context.getBaseApk();
+        JarFile jarFile = context.getBaseApkJar();
         if (jarFile == null)
             return;
 
@@ -94,6 +96,7 @@ public class PathInApkTrail extends BaseAndroidTrail implements IRemoteUpdateTra
             this.pathInApk = pathInApk;
         }
 
+        @NonNull
         @Override
         public String toString() {
             return "Entry '" + pathInApk + "' found in apk";

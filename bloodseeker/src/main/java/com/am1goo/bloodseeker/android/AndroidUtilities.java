@@ -4,15 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 
-import com.am1goo.bloodseeker.BloodseekerException;
 import com.am1goo.bloodseeker.BloodseekerExceptions;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.File;
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.jar.JarFile;
 
 public class AndroidUtilities {
@@ -31,14 +26,23 @@ public class AndroidUtilities {
         }
     }
 
-    public static JarFile getBaseApk(Activity activity, BloodseekerExceptions exceptions) {
+    public static File getBaseApkFile(Activity activity) {
         if (activity == null)
             return null;
 
         Context ctx = activity.getBaseContext();
         ApplicationInfo appInfo = ctx.getApplicationInfo();
+        return new File(appInfo.sourceDir);
+    }
+
+    public static JarFile getBaseApkJar(Activity activity, BloodseekerExceptions exceptions) {
+        File file = getBaseApkFile(activity);
+        return getJar(file, exceptions);
+    }
+
+    public static JarFile getJar(File file, BloodseekerExceptions exceptions) {
         try {
-            return new JarFile(appInfo.sourceDir);
+            return new JarFile(file);
         } catch (Exception ex) {
             exceptions.add(AndroidUtilities.class, ex);
             return null;

@@ -10,6 +10,7 @@ import com.am1goo.bloodseeker.android.AndroidUtilities;
 import com.am1goo.bloodseeker.android.IAndroidTrail;
 import com.am1goo.bloodseeker.trails.TrailsManager;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,8 @@ public class AndroidTrailsManager extends TrailsManager {
 
     private final List<IAndroidTrail> androidTrails;
     private final Activity activity;
-    private JarFile baseApk;
+    private File baseApkFile;
+    private JarFile baseApkJar;
 
     public AndroidTrailsManager(ExecutorService asyncExecutor) {
         super(asyncExecutor);
@@ -43,9 +45,10 @@ public class AndroidTrailsManager extends TrailsManager {
 
     @Override
     public void createTasks(List<TrailRunnable> result) {
-        baseApk = AndroidUtilities.getBaseApk(activity, exceptions);
+        baseApkFile = AndroidUtilities.getBaseApkFile(activity);
+        baseApkJar = AndroidUtilities.getBaseApkJar(activity, exceptions);
 
-        final AndroidAppContext appContext = new AndroidAppContext(activity, baseApk);
+        final AndroidAppContext appContext = new AndroidAppContext(activity, baseApkFile, baseApkJar);
         for (IAndroidTrail androidTrail : androidTrails) {
             TrailRunnable runnable = new AndroidTrailRunnable(appContext, androidTrail);
             result.add(runnable);
@@ -55,9 +58,9 @@ public class AndroidTrailsManager extends TrailsManager {
 
     @Override
     public void completeTasks() {
-        if (baseApk != null) {
+        if (baseApkJar != null) {
             try {
-                baseApk.close();
+                baseApkJar.close();
             }
             catch (IOException ex) {
                 exceptions.add(this, ex);

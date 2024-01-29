@@ -1,5 +1,7 @@
 package com.am1goo.bloodseeker.trails;
 
+import androidx.annotation.NonNull;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -76,7 +78,8 @@ public class ClassNameTrail implements IRemoteUpdateTrail, ITrail {
 			this.className = className;
 		}
 		
-		@Override
+		@NonNull
+        @Override
 		public String toString() {
 			return "Class '" + className + "' found";
 		}

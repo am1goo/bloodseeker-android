@@ -2,6 +2,8 @@ package com.am1goo.bloodseeker.android.trails;
 
 import android.app.Activity;
 
+import androidx.annotation.NonNull;
+
 import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.android.AndroidAppContext;
 import com.am1goo.bloodseeker.IResult;
@@ -12,13 +14,9 @@ import com.am1goo.bloodseeker.update.RemoteUpdateSerializable;
 import com.am1goo.bloodseeker.update.RemoteUpdateWriter;
 import com.am1goo.bloodseeker.utilities.IOUtilities;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -94,7 +92,7 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail implements IRemote
         if (activity == null)
             return;
 
-        JarFile jarFile = context.getBaseApk();
+        JarFile jarFile = context.getBaseApkJar();
         if (jarFile == null)
             return;
 
@@ -382,6 +380,7 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail implements IRemote
             this.nodePath = nodePath;
         }
 
+        @NonNull
         @Override
         public String toString() {
             return "AndroidManifest.xml doesn't have node " + nodePath;
@@ -397,6 +396,7 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail implements IRemote
             this.attr = attr;
         }
 
+        @NonNull
         @Override
         public String toString() {
             return "AndroidManifest.xml doesn't have attr " + attr + " in node " + nodePath;
@@ -416,6 +416,7 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail implements IRemote
             this.expectedValue = expectedValue;
         }
 
+        @NonNull
         @Override
         public String toString() {
             return "AndroidManifest.xml node " + nodePath + " has wrong " + condition + " value (actual '" + actualValue + "', expected '" + expectedValue + "')";
