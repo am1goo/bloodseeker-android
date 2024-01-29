@@ -312,6 +312,9 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail implements IRemote
         }
 
         public Condition getCondition() {
+            if (condition == null)
+                return Condition.Eq;
+
             return condition;
         }
 
