@@ -26,6 +26,15 @@ public class AndroidUtilities {
         }
     }
 
+    public static File getLibraryDir(Activity activity) {
+        if (activity == null)
+            return null;
+
+        Context ctx = activity.getBaseContext();
+        ApplicationInfo appInfo = ctx.getApplicationInfo();
+        return new File(appInfo.nativeLibraryDir);
+    }
+
     public static File getBaseApkFile(Activity activity) {
         if (activity == null)
             return null;
