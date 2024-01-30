@@ -19,3 +19,18 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# classes to external purposes
+-keep class com.am1goo.bloodseeker.Report {public *;}
+-keep class com.am1goo.bloodseeker.Async {public *;}
+-keep class com.am1goo.bloodseeker.AsyncReport {public *;}
+-keep class com.am1goo.bloodseeker.update.LocalUpdateConfig {public *;}
+-keep class com.am1goo.bloodseeker.update.RemoteUpdateConfig {public *;}
+-keep class com.am1goo.bloodseeker.update.RemoteUpdateFile {public *;}
+-keep class com.am1goo.bloodseeker.update.RemoteUpdateFiles {public *;}
+-keep class com.am1goo.bloodseeker.trails.* {public *;}
+-keep class com.am1goo.bloodseeker.android.trails.* {public *;}
+-keep class com.am1goo.bloodseeker.android.AndroidBloodseeker {public *;}
+
+-dontwarn org.slf4j.event.Level
+-dontwarn org.slf4j.event.LoggingEvent
