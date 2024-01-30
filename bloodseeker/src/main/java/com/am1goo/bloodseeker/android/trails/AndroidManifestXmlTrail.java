@@ -33,17 +33,13 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail implements IRemote
     private static final String androidManifestFilename = "AndroidManifest.xml";
     private static final String androidManifestNamespace = "http://schemas.android.com/apk/res/android";
 
+    private static final short VERSION = 1;
+    private short version;
     private Looker[] lookers;
     private BloodseekerExceptions exceptions;
 
-    public AndroidManifestXmlTrail() {
-    }
-
-    public AndroidManifestXmlTrail(Looker looker) {
-        this(new Looker[] { looker } );
-    }
-
     public AndroidManifestXmlTrail(Looker[] lookers) {
+        this.version = VERSION;
         this.lookers = lookers;
         this.exceptions = new BloodseekerExceptions();
 
@@ -55,11 +51,13 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail implements IRemote
 
     @Override
     public void load(RemoteUpdateReader reader) throws Exception {
+        this.version = reader.readVersion();
         this.lookers = reader.readArray(Looker.class);
     }
 
     @Override
     public void save(RemoteUpdateWriter writer) throws Exception {
+        writer.writeVersion(version);
         writer.writeArray(lookers);
     }
 

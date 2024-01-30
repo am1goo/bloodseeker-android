@@ -21,12 +21,8 @@ public class ApkChecksumTrail extends BaseAndroidTrail implements IRemoteUpdateT
     private long checksum;
 
     public ApkChecksumTrail(long checksum) {
-        this();
+        this.version = VERSION;
         this.checksum = checksum;
-    }
-
-    public ApkChecksumTrail() {
-        version = VERSION;
     }
 
     @Override
@@ -83,7 +79,7 @@ public class ApkChecksumTrail extends BaseAndroidTrail implements IRemoteUpdateT
         @NonNull
         @Override
         public String toString() {
-            return "Checksum mismatch, actual=" + actualChecksum + ", expected=" + expectedChecksum;
+            return "Apk checksum mismatch, actual=" + actualChecksum + ", expected=" + expectedChecksum;
         }
     }
 }

@@ -21,25 +21,17 @@ import java.util.zip.ZipEntry;
 public class FileIntegrityTrail extends BaseAndroidTrail implements IRemoteUpdateTrail {
     private static final short VERSION = 1;
     private short version;
-    private File[] filesInApk;
+    private FileInApk[] filesInApk;
 
-    public FileIntegrityTrail(File fileInApk) {
-        this( new File[] { fileInApk } );
-    }
-
-    public FileIntegrityTrail(File[] filesInApk) {
-        this();
+    public FileIntegrityTrail(FileInApk[] filesInApk) {
+        this.version = VERSION;
         this.filesInApk = filesInApk;
-    }
-
-    public FileIntegrityTrail() {
-        version = VERSION;
     }
 
     @Override
     public void load(RemoteUpdateReader reader) throws Exception {
         version = reader.readVersion();
-        filesInApk = reader.readArray(File.class);
+        filesInApk = reader.readArray(FileInApk.class);
     }
 
     @Override
@@ -80,7 +72,7 @@ public class FileIntegrityTrail extends BaseAndroidTrail implements IRemoteUpdat
         if (jarFile == null)
             return;
 
-        for (File fileInApk : filesInApk) {
+        for (FileInApk fileInApk : filesInApk) {
             if (fileInApk == null)
                 continue;
 
@@ -107,23 +99,23 @@ public class FileIntegrityTrail extends BaseAndroidTrail implements IRemoteUpdat
         }
     }
 
-    public static class File implements RemoteUpdateSerializable {
+    public static class FileInApk implements RemoteUpdateSerializable {
         private static final short VERSION = 1;
         private short version;
         private String pathInApk;
         private long checksum;
 
-        public File(String pathInApk) {
+        public FileInApk(String pathInApk) {
             this(pathInApk, 0);
         }
 
-        public File(String pathInApk, long checksum) {
+        public FileInApk(String pathInApk, long checksum) {
             this();
             this.pathInApk = pathInApk;
             this.checksum = checksum;
         }
 
-        public File() {
+        public FileInApk() {
             version = VERSION;
         }
 
@@ -160,7 +152,7 @@ public class FileIntegrityTrail extends BaseAndroidTrail implements IRemoteUpdat
         @NonNull
         @Override
         public String toString() {
-            return "Entry '" + pathInApk + "' found in apk";
+            return "Entry '" + pathInApk + "' not found in apk";
         }
     }
 

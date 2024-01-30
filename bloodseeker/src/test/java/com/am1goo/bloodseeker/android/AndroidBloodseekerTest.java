@@ -2,24 +2,19 @@ package com.am1goo.bloodseeker.android;
 
 import com.am1goo.bloodseeker.Async;
 import com.am1goo.bloodseeker.AsyncReport;
-import com.am1goo.bloodseeker.Bloodseeker;
 import com.am1goo.bloodseeker.BloodseekerTest;
 import com.am1goo.bloodseeker.Report;
 import com.am1goo.bloodseeker.android.trails.AndroidManifestXmlTrail;
+import com.am1goo.bloodseeker.android.trails.ApkChecksumTrail;
+import com.am1goo.bloodseeker.android.trails.FileIntegrityTrail;
 import com.am1goo.bloodseeker.android.trails.PackageNameTrail;
 import com.am1goo.bloodseeker.android.trails.PathInApkTrail;
-import com.am1goo.bloodseeker.trails.ClassNameTrail;
-import com.am1goo.bloodseeker.trails.DelayTrail;
-import com.am1goo.bloodseeker.update.RemoteUpdateConfig;
-import com.am1goo.bloodseeker.update.RemoteUpdateFile;
 import com.am1goo.bloodseeker.utilities.StringUtilities;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class AndroidBloodseekerTest {
 
@@ -53,5 +48,10 @@ public class AndroidBloodseekerTest {
                 "android:name",
                 "com.facebook.internal.FacebookInitProvider",
                 AndroidManifestXmlTrail.Looker.Condition.Eq)));
+        sdk.addTrail(new ApkChecksumTrail(123456789));
+        sdk.addTrail(new FileIntegrityTrail(new FileIntegrityTrail.FileInApk("META-INF/MANIFEST.MF", 987654321)));
+        sdk.addTrail(new FileIntegrityTrail(new FileIntegrityTrail.FileInApk[]
+                { new FileIntegrityTrail.FileInApk("META-INF/MANIFEST.MF", 987654321) }
+        ));
     }
 }
