@@ -1,4 +1,4 @@
-package com.am1goo.bloodseeker.trails;
+package com.am1goo.bloodseeker;
 
 import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.TrailRunnable;

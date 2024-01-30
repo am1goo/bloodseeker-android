@@ -3,7 +3,7 @@ package com.am1goo.bloodseeker.android.update;
 import android.app.Activity;
 
 import com.am1goo.bloodseeker.android.AndroidUtilities;
-import com.am1goo.bloodseeker.trails.TrailsManager;
+import com.am1goo.bloodseeker.TrailsManager;
 import com.am1goo.bloodseeker.update.IRemoteUpdateRunnable;
 import com.am1goo.bloodseeker.update.RemoteUpdateManager;
 

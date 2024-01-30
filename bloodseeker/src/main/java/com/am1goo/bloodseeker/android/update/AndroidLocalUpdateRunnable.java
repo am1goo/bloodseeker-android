@@ -1,11 +1,8 @@
 package com.am1goo.bloodseeker.android.update;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
 
-import com.am1goo.bloodseeker.trails.TrailsManager;
+import com.am1goo.bloodseeker.TrailsManager;
 import com.am1goo.bloodseeker.update.LocalUpdateRunnable;
 
 public class AndroidLocalUpdateRunnable extends LocalUpdateRunnable {

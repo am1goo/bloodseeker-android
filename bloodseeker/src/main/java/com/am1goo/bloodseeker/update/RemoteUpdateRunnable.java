@@ -5,15 +5,12 @@ import androidx.annotation.Nullable;
 import com.am1goo.bloodseeker.BloodseekerException;
 import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.ITrail;
-import com.am1goo.bloodseeker.trails.TrailsManager;
+import com.am1goo.bloodseeker.TrailsManager;
 import com.am1goo.bloodseeker.utilities.DateUtilities;
 import com.am1goo.bloodseeker.utilities.IOUtilities;
-import com.am1goo.bloodseeker.utilities.SecureUtilities;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,13 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -39,10 +31,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
 
 public class RemoteUpdateRunnable implements IRemoteUpdateRunnable {
 

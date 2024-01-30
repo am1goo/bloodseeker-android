@@ -8,7 +8,7 @@ import android.content.pm.PackageManager;
 import androidx.annotation.Nullable;
 
 import com.am1goo.bloodseeker.update.RemoteUpdateRunnable;
-import com.am1goo.bloodseeker.trails.TrailsManager;
+import com.am1goo.bloodseeker.TrailsManager;
 
 import java.io.File;
 import java.net.URI;

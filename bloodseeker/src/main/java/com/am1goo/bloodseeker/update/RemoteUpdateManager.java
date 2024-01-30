@@ -1,6 +1,6 @@
 package com.am1goo.bloodseeker.update;
 
-import com.am1goo.bloodseeker.trails.TrailsManager;
+import com.am1goo.bloodseeker.TrailsManager;
 import com.am1goo.bloodseeker.utilities.SecureUtilities;
 
 import java.io.IOException;

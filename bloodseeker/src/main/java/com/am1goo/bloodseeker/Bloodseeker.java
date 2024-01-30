@@ -1,6 +1,5 @@
 package com.am1goo.bloodseeker;
 
-import com.am1goo.bloodseeker.trails.TrailsManager;
 import com.am1goo.bloodseeker.update.ILocalUpdateRunnable;
 import com.am1goo.bloodseeker.update.IRemoteUpdateRunnable;
 import com.am1goo.bloodseeker.update.LocalUpdateConfig;

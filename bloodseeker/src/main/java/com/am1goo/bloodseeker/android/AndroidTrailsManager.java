@@ -1,14 +1,10 @@
-package com.am1goo.bloodseeker.android.trails;
+package com.am1goo.bloodseeker.android;
 
 import android.app.Activity;
 
 import com.am1goo.bloodseeker.ITrail;
 import com.am1goo.bloodseeker.TrailRunnable;
-import com.am1goo.bloodseeker.android.AndroidAppContext;
-import com.am1goo.bloodseeker.android.AndroidTrailRunnable;
-import com.am1goo.bloodseeker.android.AndroidUtilities;
-import com.am1goo.bloodseeker.android.IAndroidTrail;
-import com.am1goo.bloodseeker.trails.TrailsManager;
+import com.am1goo.bloodseeker.TrailsManager;
 
 import java.io.File;
 import java.io.IOException;

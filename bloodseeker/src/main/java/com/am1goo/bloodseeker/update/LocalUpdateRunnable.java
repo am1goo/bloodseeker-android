@@ -1,14 +1,11 @@
 package com.am1goo.bloodseeker.update;
 
-import com.am1goo.bloodseeker.BloodseekerException;
 import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.ITrail;
-import com.am1goo.bloodseeker.trails.TrailsManager;
+import com.am1goo.bloodseeker.TrailsManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class LocalUpdateRunnable implements ILocalUpdateRunnable {
 
