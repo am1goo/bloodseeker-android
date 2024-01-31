@@ -2,15 +2,11 @@ package com.am1goo.bloodseeker;
 
 import com.am1goo.bloodseeker.trails.DelayTrail;
 import com.am1goo.bloodseeker.trails.ClassNameTrail;
-import com.am1goo.bloodseeker.trails.LibraryTrail;
 import com.am1goo.bloodseeker.update.LocalUpdateConfig;
 import com.am1goo.bloodseeker.update.RemoteUpdateConfig;
-import com.am1goo.bloodseeker.update.RemoteUpdateFile;
 import com.am1goo.bloodseeker.utilities.StringUtilities;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
@@ -44,13 +40,6 @@ public class BloodseekerTest {
         ITrail trail = new ClassNameTrail("com.am1goo.bloodseeker.ITrail");
         boolean found = seek(trail);
         Assert.assertTrue(found);
-    }
-
-    @Test
-    public void testLibraryTrail() {
-        ITrail trail = new LibraryTrail("nothingButEmpty");
-        boolean found = seek(trail);
-        Assert.assertFalse(found);
     }
 
     public static void setupSdk(Bloodseeker sdk, String secretKey) throws IOException {

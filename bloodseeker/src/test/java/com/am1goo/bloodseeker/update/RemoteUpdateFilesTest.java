@@ -2,7 +2,6 @@ package com.am1goo.bloodseeker.update;
 
 import com.am1goo.bloodseeker.trails.ClassNameTrail;
 import com.am1goo.bloodseeker.trails.DelayTrail;
-import com.am1goo.bloodseeker.trails.LibraryTrail;
 import com.am1goo.bloodseeker.utilities.IOUtilities;
 import com.am1goo.bloodseeker.utilities.StringUtilities;
 
@@ -27,7 +26,6 @@ public class RemoteUpdateFilesTest {
         List<IRemoteUpdateTrail> trails = new ArrayList<>();
         trails.add(new DelayTrail(50));
         trails.add(new ClassNameTrail("java.lang.String"));
-        trails.add(new LibraryTrail("standard"));
         trails.add(new ClassNameTrail("java.lang.Number"));
 
         RemoteUpdateFile src = new RemoteUpdateFile(randomSecretKey.getBytes("utf-8"));

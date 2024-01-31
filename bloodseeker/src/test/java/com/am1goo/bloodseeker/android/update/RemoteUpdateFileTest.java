@@ -1,6 +1,7 @@
 package com.am1goo.bloodseeker.android.update;
 
 import com.am1goo.bloodseeker.android.trails.AndroidManifestXmlTrail;
+import com.am1goo.bloodseeker.android.trails.LibraryTrail;
 import com.am1goo.bloodseeker.trails.ClassNameTrail;
 import com.am1goo.bloodseeker.android.trails.PackageNameTrail;
 import com.am1goo.bloodseeker.android.trails.PathInApkTrail;
@@ -28,14 +29,18 @@ public class RemoteUpdateFileTest {
         trails.add(new ClassNameTrail("java.util.List"));
         trails.add(new ClassNameTrail("java.util.ArrayList"));
         trails.add(new ClassNameTrail("com.some.class.Name"));
+        trails.add(new LibraryTrail("unity"));
+        trails.add(new LibraryTrail("someLibrary"));
         trails.add(new PackageNameTrail("java.util"));
         trails.add(new PathInApkTrail("META-INF/MANIFEST.MF"));
         trails.add(new DelayTrail(1000));
-        trails.add(new AndroidManifestXmlTrail(new AndroidManifestXmlTrail.Looker(new String[]
-                { "application", "provider" },
-                "android:name",
-                "com.facebook.internal.FacebookInitProvider",
-                AndroidManifestXmlTrail.Looker.Condition.Eq)));
+        trails.add(new AndroidManifestXmlTrail(new AndroidManifestXmlTrail.Looker[] {
+                new AndroidManifestXmlTrail.Looker(new String[]
+                        { "application", "provider" },
+                        "android:name",
+                        "com.facebook.internal.FacebookInitProvider",
+                        AndroidManifestXmlTrail.Looker.Condition.Eq)
+        }));
         srcFile.setTrails(trails);
 
         byte[] bytes;
