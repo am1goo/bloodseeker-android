@@ -181,7 +181,7 @@ public class PackageNameTrail extends BaseAndroidTrail implements IRemoteUpdateT
 		}
 	}
 	
-	public class Result implements IResult {
+	public static class Result implements IResult {
 		private final String packageName;
 		
 		public Result(String packageName) {

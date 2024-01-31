@@ -89,7 +89,7 @@ public class PathInApkTrail extends BaseAndroidTrail implements IRemoteUpdateTra
         }
     }
 
-    public class Result implements IResult {
+    public static class Result implements IResult {
         private final String pathInApk;
 
         public Result(String pathInApk) {

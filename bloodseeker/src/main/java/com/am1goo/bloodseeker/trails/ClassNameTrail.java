@@ -71,7 +71,7 @@ public class ClassNameTrail implements IRemoteUpdateTrail, ITrail {
 		}
 	}
 
-	public class Result implements IResult {
+	public static class Result implements IResult {
 		private final String className;
 		
 		public Result(String className) {

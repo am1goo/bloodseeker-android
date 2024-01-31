@@ -17,9 +17,7 @@ public class AndroidTrailsManager extends TrailsManager {
 
     private final List<IAndroidTrail> androidTrails;
     private final Activity activity;
-    private File baseApkFile;
     private JarFile baseApkJar;
-    private File libraryDir;
 
     public AndroidTrailsManager(ExecutorService asyncExecutor) {
         super(asyncExecutor);
@@ -42,9 +40,9 @@ public class AndroidTrailsManager extends TrailsManager {
 
     @Override
     public void createTasks(List<TrailRunnable> result) {
-        baseApkFile = AndroidUtilities.getBaseApkFile(activity);
+        File baseApkFile = AndroidUtilities.getBaseApkFile(activity);
         baseApkJar = AndroidUtilities.getBaseApkJar(activity, exceptions);
-        libraryDir = AndroidUtilities.getLibraryDir(activity);
+        File libraryDir = AndroidUtilities.getLibraryDir(activity);
 
         final AndroidAppContext appContext = new AndroidAppContext(activity, baseApkFile, baseApkJar, libraryDir);
         for (IAndroidTrail androidTrail : androidTrails) {
