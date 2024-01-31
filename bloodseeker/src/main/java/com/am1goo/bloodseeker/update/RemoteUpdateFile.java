@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.InvalidParameterException;
@@ -90,13 +91,22 @@ public class RemoteUpdateFile implements RemoteUpdateSerializable {
                         System.err.println("load: class " + className + " not found, skipped");
                         continue;
                     }
-                    IRemoteUpdateTrail trail = (IRemoteUpdateTrail) classObj.newInstance();
+
+                    Constructor<?> classCctr = classObj.getDeclaredConstructor();
+                    boolean accessibleChanged = false;
+                    if (!classCctr.isAccessible()) {
+                        classCctr.setAccessible(true);
+                        accessibleChanged = true;
+                    }
+                    IRemoteUpdateTrail trail = (IRemoteUpdateTrail) classCctr.newInstance();
                     try (ByteArrayInputStream trailStream = new ByteArrayInputStream(trailBytes)) {
                         try (RemoteUpdateReader trailReader = new RemoteUpdateReader(trailStream)) {
                             trail.load(trailReader);
                             trails.add(trail);
                         }
                     }
+                    if (accessibleChanged)
+                        classCctr.setAccessible(false);
                 }
             }
         }

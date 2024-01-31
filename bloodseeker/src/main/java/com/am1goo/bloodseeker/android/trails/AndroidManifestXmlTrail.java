@@ -38,6 +38,9 @@ public class AndroidManifestXmlTrail extends BaseAndroidTrail implements IRemote
     private Looker[] lookers;
     private BloodseekerExceptions exceptions;
 
+    private AndroidManifestXmlTrail() {
+    }
+
     public AndroidManifestXmlTrail(Looker[] lookers) {
         this.version = VERSION;
         this.lookers = lookers;

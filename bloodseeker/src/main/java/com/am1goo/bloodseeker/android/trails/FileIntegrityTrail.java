@@ -15,6 +15,7 @@ import com.am1goo.bloodseeker.update.RemoteUpdateWriter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
@@ -22,6 +23,9 @@ public class FileIntegrityTrail extends BaseAndroidTrail implements IRemoteUpdat
     private static final short VERSION = 1;
     private short version;
     private FileInApk[] filesInApk;
+
+    private FileIntegrityTrail() {
+    }
 
     public FileIntegrityTrail(FileInApk[] filesInApk) {
         this.version = VERSION;
@@ -131,6 +135,21 @@ public class FileIntegrityTrail extends BaseAndroidTrail implements IRemoteUpdat
             writer.writeVersion(version);
             writer.writeString(pathInApk, "utf-8");
             writer.writeLong(checksum);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            FileInApk fileInApk = (FileInApk) o;
+            return checksum == fileInApk.checksum && Objects.equals(pathInApk, fileInApk.pathInApk);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(pathInApk, checksum);
         }
 
         public String getPathInApk() {
