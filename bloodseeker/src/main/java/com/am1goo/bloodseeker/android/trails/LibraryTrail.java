@@ -67,6 +67,9 @@ public class LibraryTrail extends BaseAndroidTrail implements IRemoteUpdateTrail
             return;
 
         File libraryDir = context.getLibraryDir();
+        if (libraryDir == null)
+            return;
+
         for (String libraryName : libraryNames) {
             if (libraryName == null)
                 continue;
