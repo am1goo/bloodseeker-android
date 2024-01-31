@@ -48,16 +48,23 @@ public class Node implements IElement {
     }
 
     public boolean validate(Map<String, String> nses, List<Axml.Node> nodes) {
-        List<Axml.Node> found = nodes.stream()
-                .filter(x -> Objects.equals(x.name, name))
-                .collect(Collectors.toList());
-
+        List<Axml.Node> found = findNodesByName(nodes, name);
         if (!validateChildren(children, nses, found))
             return false;
 
         boolean result = false;
         for (Axml.Node node : nodes) {
             result |= validateAttributes(attributes, nses, node);
+        }
+        return result;
+    }
+
+    private static List<Axml.Node> findNodesByName(List<Axml.Node> nodes, String name) {
+        List<Axml.Node> result = new ArrayList<>();
+        for (Axml.Node node : nodes) {
+            if (Objects.equals(node.name, name)) {
+                result.add(node);
+            }
         }
         return result;
     }

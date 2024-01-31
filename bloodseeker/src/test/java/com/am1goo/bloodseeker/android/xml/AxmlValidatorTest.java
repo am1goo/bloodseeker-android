@@ -1,13 +1,13 @@
 package com.am1goo.bloodseeker.android.xml;
 
 import com.am1goo.bloodseeker.android.axml.AxmlValidator;
+import com.am1goo.bloodseeker.utilities.PathUtilities;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import pxb.android.axml.Axml;
 import pxb.android.axml.AxmlReader;
@@ -30,8 +30,9 @@ public class AxmlValidatorTest {
                                 .attribute("android:name", "android.intent.category.LAUNCHER")
                 .root();
 
-        Path path = Paths.get("src/test/java/com/am1goo/bloodseeker/android/xml/axml/AndroidManifest.xml");
-        byte[] bytes = Util.readFile(path.toFile());
+        String path = PathUtilities.join("src/test/java/com/am1goo/bloodseeker/android/xml/axml/AndroidManifest.xml");
+        File file = new File(path);
+        byte[] bytes = Util.readFile(file);
         AxmlReader reader = new AxmlReader(bytes);
         Axml axml = new Axml();
         reader.accept(axml);

@@ -4,8 +4,6 @@ import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,6 +14,7 @@ import com.am1goo.bloodseeker.update.IRemoteUpdateTrail;
 import com.am1goo.bloodseeker.update.RemoteUpdateFile;
 import com.am1goo.bloodseeker.update.RemoteUpdateReader;
 import com.am1goo.bloodseeker.update.RemoteUpdateWriter;
+import com.am1goo.bloodseeker.utilities.PathUtilities;
 
 public class LibraryTrail extends BaseAndroidTrail implements IRemoteUpdateTrail {
 
@@ -75,8 +74,8 @@ public class LibraryTrail extends BaseAndroidTrail implements IRemoteUpdateTrail
                 continue;
 
             final String mappedName = System.mapLibraryName(libraryName);
-            final Path libraryPath = Paths.get(libraryDir.getPath(), mappedName);
-            final File libraryFile = libraryPath.toFile();
+            final String libraryPath = PathUtilities.join(libraryDir.getPath(), mappedName);
+            final File libraryFile = new File(libraryPath);
             if (!libraryFile.exists())
                 continue;
 

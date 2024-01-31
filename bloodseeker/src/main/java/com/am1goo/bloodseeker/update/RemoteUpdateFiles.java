@@ -1,37 +1,28 @@
 package com.am1goo.bloodseeker.update;
 
 import com.am1goo.bloodseeker.utilities.IOUtilities;
+import com.am1goo.bloodseeker.utilities.PathUtilities;
 import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RemoteUpdateFiles {
 
     public static Exception test(String pathToDirectory, String pathToBmxFile) {
-        Path dirPath = Paths.get(pathToDirectory);
-        if (!dirPath.isAbsolute()) {
-            dirPath = dirPath.toAbsolutePath();
+        File dirFile = new File(pathToDirectory);
+        if (!dirFile.isAbsolute()) {
+            dirFile = dirFile.getAbsoluteFile();
         }
 
-        Path bmxPath = Paths.get(pathToBmxFile);
-        if (!bmxPath.isAbsolute())
-            bmxPath = bmxPath.toAbsolutePath();
-        return test(dirPath, bmxPath);
-    }
-
-    public static Exception test(Path pathToDirectory, Path pathToBmxFile) {
-        return test(pathToDirectory.toFile(), pathToBmxFile.toFile());
+        File bmxFile = new File(pathToBmxFile);
+        if (!bmxFile.isAbsolute()) {
+            bmxFile = bmxFile.getAbsoluteFile();
+        }
+        return test(dirFile, bmxFile);
     }
 
     public static Exception test(File pathToDirectory, File pathToBmxFile) {
@@ -39,7 +30,7 @@ public class RemoteUpdateFiles {
             Scheme scheme = getScheme(pathToDirectory);
             byte[] secretKey = scheme.secretKey.getBytes("utf-8");
             RemoteUpdateFile file = new RemoteUpdateFile(secretKey);
-            try (InputStream inputStream = Files.newInputStream(pathToBmxFile.toPath())) {
+            try (InputStream inputStream = new FileInputStream(pathToBmxFile)) {
                 file.load(inputStream);
                 return null;
             }
@@ -51,20 +42,16 @@ public class RemoteUpdateFiles {
     }
 
     public static RemoteUpdateFile fromDirectory(String pathToDirectory) throws Exception {
-        Path path = Paths.get(pathToDirectory);
-        if (!path.isAbsolute()) {
-            path = path.toAbsolutePath();
+        File file = new File(pathToDirectory);
+        if (!file.isAbsolute()) {
+            file = file.getAbsoluteFile();
         }
-        return fromDirectory(path);
+        return fromDirectory(file);
     }
 
-    public static RemoteUpdateFile fromDirectory(Path path) throws Exception {
-        return fromDirectory(path.toFile());
-    }
-
-    public static RemoteUpdateFile fromDirectory(File file) throws Exception {
-        Scheme scheme = getScheme(file);
-        return fromScheme(scheme, file);
+    public static RemoteUpdateFile fromDirectory(File directory) throws Exception {
+        Scheme scheme = getScheme(directory);
+        return fromScheme(scheme, directory);
     }
 
     public static RemoteUpdateFile fromScheme(Scheme scheme, File directory) throws Exception {
@@ -76,8 +63,8 @@ public class RemoteUpdateFiles {
         List<IRemoteUpdateTrail> trails = new ArrayList<>();
         for (Scheme.File schemeFile : scheme.files) {
             Class<?> clazz = Class.forName(schemeFile.className);
-            Path path = Paths.get(directory.getPath(), schemeFile.path);
-            try (InputStream inputStream = Files.newInputStream(path)) {
+            String path = PathUtilities.join(directory.getPath(), schemeFile.path);
+            try (InputStream inputStream = new FileInputStream(path)) {
                 String json = IOUtilities.readAllText(inputStream);
                 Object obj = new Gson().fromJson(json, clazz);
                 if (!(obj instanceof IRemoteUpdateTrail))
@@ -93,15 +80,15 @@ public class RemoteUpdateFiles {
         return file;
     }
 
-    private static Scheme getScheme(File file) throws Exception {
-        if (!file.isDirectory())
-            throw new Exception("project path '" + file.getPath() + "' should be directory");
+    private static Scheme getScheme(File directory) throws Exception {
+        if (!directory.isDirectory())
+            throw new Exception("project path '" + directory.getPath() + "' should be directory");
 
-        if (!file.exists())
-            throw new Exception("project directory " + file.getPath() + " doesn't exists");
+        if (!directory.exists())
+            throw new Exception("project directory " + directory.getPath() + " doesn't exists");
 
-        Path path = Paths.get(file.getPath(), "project.json");
-        try (InputStream inputStream = Files.newInputStream(path)) {
+        String path = PathUtilities.join(directory.getPath(), "project.json");
+        try (InputStream inputStream = new FileInputStream(path)) {
             String json = IOUtilities.readAllText(inputStream);
             return new Gson().fromJson(json, Scheme.class);
         }

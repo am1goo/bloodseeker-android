@@ -3,6 +3,7 @@ package com.am1goo.bloodseeker.update;
 import com.am1goo.bloodseeker.trails.ClassNameTrail;
 import com.am1goo.bloodseeker.trails.DelayTrail;
 import com.am1goo.bloodseeker.utilities.IOUtilities;
+import com.am1goo.bloodseeker.utilities.PathUtilities;
 import com.am1goo.bloodseeker.utilities.StringUtilities;
 
 import org.junit.Assert;
@@ -10,11 +11,10 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class RemoteUpdateFilesTest {
     @Test
     public void testLoadFromProject() throws Exception {
         String randomSecretKey = "0123456789ABCDEF"; //from file 'examples/remote-update-project-hierarchy/project.json'
-        Path pathToProject = Paths.get("examples/remote-update-project-hierarchy/");
+        File pathToProject = new File("examples/remote-update-project-hierarchy/");
 
         RemoteUpdateFile src = RemoteUpdateFiles.fromDirectory(pathToProject);
         Assert.assertNotNull(src);
@@ -62,8 +62,9 @@ public class RemoteUpdateFilesTest {
 
         Assert.assertArrayEquals(src.getTrails().toArray(), dest.getTrails().toArray());
 
-        Path tempFile = Paths.get(IOUtilities.getTempDir(), "test_" + System.currentTimeMillis() + ".bmx");
-        try (OutputStream outputStream = Files.newOutputStream(tempFile.toFile().toPath())) {
+        String tempPath = PathUtilities.join(IOUtilities.getTempDir(), "test_" + System.currentTimeMillis() + ".bmx");
+        File tempFile = new File(tempPath);
+        try (OutputStream outputStream = new FileOutputStream(tempFile)) {
             dest.save(outputStream);
         }
 

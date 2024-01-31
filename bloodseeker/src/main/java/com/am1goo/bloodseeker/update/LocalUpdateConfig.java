@@ -2,10 +2,9 @@ package com.am1goo.bloodseeker.update;
 
 import com.am1goo.bloodseeker.utilities.IOUtilities;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class LocalUpdateConfig {
 
@@ -17,7 +16,7 @@ public class LocalUpdateConfig {
     }
 
     public void setFile(String path) throws IOException {
-        try (InputStream inputStream = Files.newInputStream(Paths.get(path))) {
+        try (InputStream inputStream = new FileInputStream(path)) {
             byte[] bytes = IOUtilities.readAllBytes(inputStream);
             setFile(bytes);
         }

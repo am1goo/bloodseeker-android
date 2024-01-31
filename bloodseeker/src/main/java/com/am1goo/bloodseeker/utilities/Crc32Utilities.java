@@ -1,9 +1,9 @@
 package com.am1goo.bloodseeker.utilities;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
@@ -14,7 +14,7 @@ public class Crc32Utilities {
             return 0;
 
         try {
-            try (InputStream inputStream = Files.newInputStream(file.toPath())) {
+            try (InputStream inputStream = new FileInputStream(file)) {
                 return getCrc32(inputStream);
             }
         } catch (IOException ex) {

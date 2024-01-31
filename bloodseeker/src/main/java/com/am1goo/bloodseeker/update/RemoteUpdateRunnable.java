@@ -6,29 +6,25 @@ import com.am1goo.bloodseeker.BloodseekerException;
 import com.am1goo.bloodseeker.BloodseekerExceptions;
 import com.am1goo.bloodseeker.ITrail;
 import com.am1goo.bloodseeker.TrailsManager;
-import com.am1goo.bloodseeker.utilities.DateUtilities;
+import com.am1goo.bloodseeker.utilities.TimeUtilities;
 import com.am1goo.bloodseeker.utilities.IOUtilities;
+import com.am1goo.bloodseeker.utilities.PathUtilities;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
@@ -131,10 +127,10 @@ public class RemoteUpdateRunnable implements IRemoteUpdateRunnable {
         result.addAll(file.getTrails());
     }
 
-    private Path getCachePath(URI uri, File cacheDir) throws NoSuchAlgorithmException {
+    private String getCachePath(URI uri, File cacheDir) throws NoSuchAlgorithmException {
         String uriHash = md5(uri.getPath());
         String fileName = uriHash + RemoteUpdateFile.EXTENSION;
-        return Paths.get(cacheDir.getPath(), fileName);
+        return PathUtilities.join(cacheDir.getPath(), fileName);
     }
 
     private boolean cacheLoadFile(URI uri, byte[] secretKey, File cacheDir, List<ITrail> trails) {
@@ -153,23 +149,21 @@ public class RemoteUpdateRunnable implements IRemoteUpdateRunnable {
             return false;
         }
 
-        Path cachePath = getCachePath(uri, cacheDir);
-        File cacheFile = new File(cachePath.toString());
+        String cachePath = getCachePath(uri, cacheDir);
+        File cacheFile = new File(cachePath);
         if (!cacheFile.exists())
             return false;
 
-        BasicFileAttributes cacheFileAttrs = Files.readAttributes(cachePath, BasicFileAttributes.class);
-        Date createdAt = new Date(cacheFileAttrs.creationTime().to(TimeUnit.MILLISECONDS));
+        long lastModified = cacheFile.lastModified();
+        Date lastModifiedTime = new Date(lastModified);
         Date now = new Date();
-        if (createdAt.getTime() >  now.getTime())
+
+        long millis = lastModifiedTime.getTime() - now.getTime();
+        long seconds = TimeUtilities.getSeconds(millis);
+        if (seconds < 0 || seconds > cacheTTL)
             return false;
 
-        Duration delta = DateUtilities.getDuration(now, createdAt);
-        long seconds = delta.get(ChronoUnit.SECONDS);
-        if (seconds > cacheTTL)
-            return false;
-
-        try (InputStream cacheStream = Files.newInputStream(cacheFile.toPath())) {
+        try (InputStream cacheStream = new FileInputStream(cacheFile)) {
             loadFromFile(cacheStream, secretKey, trails);
         }
 
@@ -183,8 +177,8 @@ public class RemoteUpdateRunnable implements IRemoteUpdateRunnable {
             return;
         }
 
-        Path cachePath = getCachePath(uri, cacheDir);
-        File cacheFile = new File(cachePath.toString());
+        String cachePath = getCachePath(uri, cacheDir);
+        File cacheFile = new File(cachePath);
 
         boolean exists = false;
         if (cacheFile.exists())
@@ -193,7 +187,7 @@ public class RemoteUpdateRunnable implements IRemoteUpdateRunnable {
         if (exists)
             return;
 
-        try (OutputStream outputStream = Files.newOutputStream(cacheFile.toPath())) {
+        try (OutputStream outputStream = new FileOutputStream(cacheFile)) {
             IOUtilities.copy(inputStream, outputStream);
         }
         System.out.println("Thread #" + Thread.currentThread().getId() + ": update saved in cache");

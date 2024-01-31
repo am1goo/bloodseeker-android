@@ -22,7 +22,9 @@ public class AxmlValidator {
     public boolean validate(Axml axml) {
         final Map<String, String> nses = new HashMap<>();
         for (Axml.Ns ns : axml.nses) {
-            nses.putIfAbsent(ns.prefix, ns.uri);
+            if (nses.containsKey(ns.prefix))
+                continue;
+            nses.put(ns.prefix, ns.uri);
         }
         return root.validate(nses, axml.firsts);
     }
