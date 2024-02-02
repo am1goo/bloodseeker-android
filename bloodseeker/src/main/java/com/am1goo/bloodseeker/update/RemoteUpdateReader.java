@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +40,16 @@ public class RemoteUpdateReader extends DataInputStream {
         return readShort();
     }
 
+    public String readStringOrNull() throws IOException {
+        boolean notNull = readBoolean();
+        if (notNull) {
+            return readString();
+        }
+        else {
+            return null;
+        }
+    }
+
     public String readString() throws IOException {
         int bytesCount = readInt();
         byte[] bytes = new byte[bytesCount];
@@ -70,7 +81,18 @@ public class RemoteUpdateReader extends DataInputStream {
 
     public <T> T readObject(Class<T> clazz) throws Exception {
         byte[] bytes = readBytes();
-        Object classObj = clazz.newInstance();
+
+        Constructor<?> classCctr = clazz.getDeclaredConstructor();
+        boolean accessibleChanged = false;
+        if (!classCctr.isAccessible()) {
+            classCctr.setAccessible(true);
+            accessibleChanged = true;
+        }
+
+        Object classObj = classCctr.newInstance();
+        if (accessibleChanged)
+            classCctr.setAccessible(false);
+
         if (bytes.length > 0) {
             if (classObj instanceof RemoteUpdateSerializable) {
                 RemoteUpdateSerializable serializable = (RemoteUpdateSerializable) classObj;

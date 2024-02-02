@@ -26,6 +26,14 @@ public class RemoteUpdateWriter extends DataOutputStream {
         writeShort(version);
     }
 
+    public void writeStringOrNull(String str, String charsetName) throws IOException {
+        boolean notNull = str != null;
+        writeBoolean(notNull);
+        if (notNull) {
+            writeString(str, charsetName);
+        }
+    }
+
     public void writeString(String str, String charsetName) throws IOException {
         byte[] bytes = str.getBytes(charsetName);
         writeInt(bytes.length);

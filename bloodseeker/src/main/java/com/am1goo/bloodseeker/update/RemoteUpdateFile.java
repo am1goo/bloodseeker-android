@@ -86,27 +86,29 @@ public class RemoteUpdateFile implements RemoteUpdateSerializable {
                     String className = payloadReader.readString();
                     byte[] trailBytes = payloadReader.readBytes();
 
-                    Class<?> classObj = getClassSafe(className);
-                    if (classObj == null) {
+                    Class<?> clazz = getClassSafe(className);
+                    if (clazz == null) {
                         System.err.println("load: class " + className + " not found, skipped");
                         continue;
                     }
 
-                    Constructor<?> classCctr = classObj.getDeclaredConstructor();
+                    Constructor<?> classCctr = clazz.getDeclaredConstructor();
                     boolean accessibleChanged = false;
                     if (!classCctr.isAccessible()) {
                         classCctr.setAccessible(true);
                         accessibleChanged = true;
                     }
+
                     IRemoteUpdateTrail trail = (IRemoteUpdateTrail) classCctr.newInstance();
+                    if (accessibleChanged)
+                        classCctr.setAccessible(false);
+
                     try (ByteArrayInputStream trailStream = new ByteArrayInputStream(trailBytes)) {
                         try (RemoteUpdateReader trailReader = new RemoteUpdateReader(trailStream)) {
                             trail.load(trailReader);
                             trails.add(trail);
                         }
                     }
-                    if (accessibleChanged)
-                        classCctr.setAccessible(false);
                 }
             }
         }
