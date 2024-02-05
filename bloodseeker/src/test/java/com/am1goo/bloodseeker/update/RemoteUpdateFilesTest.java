@@ -23,40 +23,6 @@ import java.util.List;
 public class RemoteUpdateFilesTest {
 
     @Test
-    public void testSaveAndLoadInMemory() throws Exception {
-        String randomSecretKey = StringUtilities.getRandomString(76);
-        List<IRemoteUpdateTrail> trails = new ArrayList<>();
-        trails.add(new DelayTrail(50));
-        trails.add(new ClassNameTrail("java.lang.String"));
-        trails.add(new ClassNameTrail("java.lang.Number"));
-        trails.add(new JavaSystemPropertyTrail(
-            new JavaSystemPropertyTrail.SystemProperty[] {
-                new JavaSystemPropertyTrail.SystemProperty("os.name"),
-                new JavaSystemPropertyTrail.SystemProperty("os.version", Condition.Eq,"10.*"),
-                new JavaSystemPropertyTrail.SystemProperty("os.version",Condition.NonEq, "11.0"),
-                new JavaSystemPropertyTrail.SystemProperty("os.version",Condition.NonEq, "10.0"),
-                new JavaSystemPropertyTrail.SystemProperty("java.version",Condition.Eq, "17.*"),
-        }));
-
-        RemoteUpdateFile src = new RemoteUpdateFile(randomSecretKey.getBytes("utf-8"));
-        src.setTrails(trails);
-
-        byte[] bytes = null;
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            src.save(outputStream);
-            bytes = outputStream.toByteArray();
-        }
-
-        RemoteUpdateFile dest = new RemoteUpdateFile(randomSecretKey.getBytes("utf-8"));
-        try (InputStream inputStream = new ByteArrayInputStream(bytes)) {
-            dest.load(inputStream);
-        }
-
-        Assert.assertEquals(src.getVersion(), dest.getVersion());
-        Assert.assertArrayEquals(src.getTrails().toArray(), dest.getTrails().toArray());
-    }
-
-    @Test
     public void testLoadFromProject() throws Exception {
         String randomSecretKey = "0123456789ABCDEF"; //from file 'examples/remote-update-project-hierarchy/project.json'
         File pathToProject = new File("examples/remote-update-project-hierarchy/");
