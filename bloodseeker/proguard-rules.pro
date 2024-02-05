@@ -21,6 +21,7 @@
 #-renamesourcefileattribute SourceFile
 
 # classes to external purposes
+-keep class com.am1goo.bloodseeker.Condition {public *;}
 -keep class com.am1goo.bloodseeker.Report {public *;}
 -keep class com.am1goo.bloodseeker.Async {public *;}
 -keep class com.am1goo.bloodseeker.AsyncReport {public *;}
