@@ -3,7 +3,7 @@ package com.am1goo.bloodseeker.update;
 import com.am1goo.bloodseeker.Condition;
 import com.am1goo.bloodseeker.trails.ClassNameTrail;
 import com.am1goo.bloodseeker.trails.DelayTrail;
-import com.am1goo.bloodseeker.trails.SystemPropertyTrail;
+import com.am1goo.bloodseeker.trails.JavaSystemPropertyTrail;
 import com.am1goo.bloodseeker.utilities.IOUtilities;
 import com.am1goo.bloodseeker.utilities.PathUtilities;
 import com.am1goo.bloodseeker.utilities.StringUtilities;
@@ -29,13 +29,13 @@ public class RemoteUpdateFilesTest {
         trails.add(new DelayTrail(50));
         trails.add(new ClassNameTrail("java.lang.String"));
         trails.add(new ClassNameTrail("java.lang.Number"));
-        trails.add(new SystemPropertyTrail(
-            new SystemPropertyTrail.SystemProperty[] {
-                new SystemPropertyTrail.SystemProperty("os.name"),
-                new SystemPropertyTrail.SystemProperty("os.version", Condition.Eq,"10.*"),
-                new SystemPropertyTrail.SystemProperty("os.version",Condition.NonEq, "11.0"),
-                new SystemPropertyTrail.SystemProperty("os.version",Condition.NonEq, "10.0"),
-                new SystemPropertyTrail.SystemProperty("java.version",Condition.Eq, "17.*"),
+        trails.add(new JavaSystemPropertyTrail(
+            new JavaSystemPropertyTrail.SystemProperty[] {
+                new JavaSystemPropertyTrail.SystemProperty("os.name"),
+                new JavaSystemPropertyTrail.SystemProperty("os.version", Condition.Eq,"10.*"),
+                new JavaSystemPropertyTrail.SystemProperty("os.version",Condition.NonEq, "11.0"),
+                new JavaSystemPropertyTrail.SystemProperty("os.version",Condition.NonEq, "10.0"),
+                new JavaSystemPropertyTrail.SystemProperty("java.version",Condition.Eq, "17.*"),
         }));
 
         RemoteUpdateFile src = new RemoteUpdateFile(randomSecretKey.getBytes("utf-8"));

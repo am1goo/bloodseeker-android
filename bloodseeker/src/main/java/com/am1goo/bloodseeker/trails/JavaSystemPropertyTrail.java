@@ -19,18 +19,18 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 
-public class SystemPropertyTrail implements IRemoteUpdateTrail, ITrail {
+public class JavaSystemPropertyTrail implements IRemoteUpdateTrail, ITrail {
 
     private static final short VERSION = 1;
     private short version;
     private SystemProperty[] properties;
 
-    private SystemPropertyTrail() {
+    private JavaSystemPropertyTrail() {
     }
 
-    public SystemPropertyTrail(SystemProperty[] propertyNames) {
+    public JavaSystemPropertyTrail(SystemProperty[] properties) {
         this.version = VERSION;
-        this.properties = propertyNames;
+        this.properties = properties;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class SystemPropertyTrail implements IRemoteUpdateTrail, ITrail {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        SystemPropertyTrail that = (SystemPropertyTrail) o;
+        JavaSystemPropertyTrail that = (JavaSystemPropertyTrail) o;
         return Arrays.equals(properties, that.properties);
     }
 
@@ -112,7 +112,7 @@ public class SystemPropertyTrail implements IRemoteUpdateTrail, ITrail {
             return check(condition, equals);
         }
         catch (InvalidParameterException ex) {
-            exceptions.add(SystemPropertyTrail.class, ex);
+            exceptions.add(JavaSystemPropertyTrail.class, ex);
             return false;
         }
     }
