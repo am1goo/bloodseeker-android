@@ -2,6 +2,7 @@ package com.am1goo.bloodseeker.android.update;
 
 import com.am1goo.bloodseeker.android.trails.AndroidManifestXmlTrail;
 import com.am1goo.bloodseeker.android.trails.FileIntegrityTrail;
+import com.am1goo.bloodseeker.android.trails.InstalledAppTrail;
 import com.am1goo.bloodseeker.android.trails.LibraryTrail;
 import com.am1goo.bloodseeker.trails.ClassNameTrail;
 import com.am1goo.bloodseeker.android.trails.PackageNameTrail;
@@ -44,6 +45,10 @@ public class RemoteUpdateFileTest {
         }));
         trails.add(new FileIntegrityTrail(new FileIntegrityTrail.FileInApk[] {
             new FileIntegrityTrail.FileInApk("META-INF/MANIFEST.MF", 0),
+        }));
+        trails.add(new InstalledAppTrail(new String[] {
+                "com.any.strange.package.name.one",
+                "com.any.strange.package.name.two",
         }));
         srcFile.setTrails(trails);
 
